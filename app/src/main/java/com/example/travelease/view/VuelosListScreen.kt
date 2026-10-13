@@ -46,24 +46,51 @@ fun VuelosListScreen(
             .background(Color(0xFFEDF1F5))
             .padding(16.dp)
     ) {
+        // --- Cabecera Azul ---
         Surface(
             color = Color(0xFF2196F3),
             shape = RoundedCornerShape(16.dp),
             modifier = Modifier.fillMaxWidth().height(90.dp)
         ) {
             Box(contentAlignment = Alignment.Center) {
-                Text("Vuelos Registrados", color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                Text(
+                    "Vuelos Registrados",
+                    color = Color.White,
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // 🚀 BOTÓN "AGREGAR" MOVIDO ARRIBA (Alineado a la derecha)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End
+        ) {
+            OutlinedButton(
+                onClick = onNavigateToAgregar,
+                shape = RoundedCornerShape(12.dp),
+                border = BorderStroke(1.dp, Color.Black),
+                colors = ButtonDefaults.outlinedButtonColors(containerColor = Color.White)
+            ) {
+                Text("Agregar", color = Color.Black, fontWeight = FontWeight.Bold)
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // --- Lista de Vuelos ---
         if (isLoading) {
             Box(modifier = Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator(color = Color(0xFF2196F3))
             }
         } else {
-            LazyColumn(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            LazyColumn(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
                 items(vuelos) { vuelo ->
                     VueloCardItem(
                         vuelo = vuelo,
@@ -86,20 +113,17 @@ fun VuelosListScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        OutlinedButton(
-            onClick = onNavigateToAgregar,
-            shape = RoundedCornerShape(12.dp),
-            border = BorderStroke(1.dp, Color.Black),
-            colors = ButtonDefaults.outlinedButtonColors(containerColor = Color.White),
-            modifier = Modifier.padding(start = 4.dp)
+        // --- Botón de Regresar (Abajo) ---
+        IconButton(
+            onClick = onNavigateBack,
+            modifier = Modifier.padding(bottom = 8.dp)
         ) {
-            Text("Agregar", color = Color.Black, fontWeight = FontWeight.Bold)
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        IconButton(onClick = onNavigateBack, modifier = Modifier.padding(bottom = 8.dp)) {
-            Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = "Regresar", modifier = Modifier.size(36.dp), tint = Color.DarkGray)
+            Icon(
+                Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                contentDescription = "Regresar",
+                modifier = Modifier.size(36.dp),
+                tint = Color.DarkGray
+            )
         }
     }
 }
@@ -145,7 +169,7 @@ fun VueloCardItem(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 8.dp, horizontal = 24.dp),
-                horizontalArrangement = Arrangement.SpaceBetween, // 🚀 Coloca uno a cada extremo (Izquierda y Derecha)
+                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 // ✏️ Botón de Editar (Lápiz) -> Lado Izquierdo

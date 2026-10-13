@@ -60,35 +60,43 @@ fun VueloFormScreen(
         }
     }
 
-    // 🚀 Función directa para enviar los datos incluyendo el precio al ViewModel
+    // 🚀 Función directa para enviar los datos al ViewModel
     val ejecutarGuardado = {
-        println("🚀 ENVIANDO A DJANGO -> Aerolínea: '$aerolinea', Precio: '$precio', Origen: '$origen', Salida: '$fechaSalida'")
+        if (aerolinea.isBlank() || precio.isBlank() || origen.isBlank() || destino.isBlank()) {
+            Toast.makeText(context, "Por favor, llene los campos principales", Toast.LENGTH_SHORT).show()
+        } else {
+            println("🚀 ENVIANDO A DJANGO -> Aerolínea: '$aerolinea', Precio: '$precio', Origen: '$origen', Salida: '$fechaSalida'")
 
-        viewModel.guardarVuelo(
-            modo = modo,
-            vueloId = vueloId,
-            aerolinea = aerolinea,
-            precioStr = precio,
-            origen = origen,
-            destino = destino,
-            fechaSalida = fechaSalida,
-            fechaEntrada = fechaEntrada,
-            onSuccess = {
-                Toast.makeText(context, "¡Vuelo guardado con éxito!", Toast.LENGTH_SHORT).show()
-                onNavigateBack()
-            },
-            onError = { errorMensaje ->
-                Toast.makeText(context, "Django dice: $errorMensaje", Toast.LENGTH_LONG).show()
-                println("🚨 Error de Django al guardar: $errorMensaje")
-            }
-        )
+            viewModel.guardarVuelo(
+                modo = modo,
+                vueloId = vueloId,
+                aerolinea = aerolinea,
+                precioStr = precio,
+                origen = origen,
+                destino = destino,
+                fechaSalida = fechaSalida,
+                fechaEntrada = fechaEntrada,
+                onSuccess = {
+                    Toast.makeText(context, "¡Vuelo guardado con éxito!", Toast.LENGTH_SHORT).show()
+                    onNavigateBack()
+                },
+                onError = { errorMensaje ->
+                    Toast.makeText(context, "Django dice: $errorMensaje", Toast.LENGTH_LONG).show()
+                    println("🚨 Error de Django al guardar: $errorMensaje")
+                }
+            )
+        }
     }
+
+    // 🚀 Configuración del Scroll State
+    val scrollState = rememberScrollState()
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFEDF1F5))
-            .imePadding()
+            .verticalScroll(scrollState)
+            .imePadding() // Empuja el contenido cuando el teclado sube
             .padding(16.dp)
     ) {
         // --- Cabecera Azul ---
@@ -101,126 +109,123 @@ fun VueloFormScreen(
         ) {
             Box(contentAlignment = Alignment.Center) {
                 Text(
-                    text = if (modo == "editar") "Editar Vuelo" else "Datos del Vuelo",
+                    text = if (modo == "editar") "EDITAR VUELO" else "DATOS DEL VUELO",
                     color = Color.White,
-                    fontSize = 24.sp,
+                    fontSize = 20.sp, // Ajustado para coincidir con Transporte
                     fontWeight = FontWeight.Bold
                 )
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
-        // --- Contenedor scrolleable ---
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .verticalScroll(rememberScrollState())
+        // --- Botón principal alineado a la derecha ---
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End
         ) {
-            Text(text = "Aerolínea", fontWeight = FontWeight.Bold, color = Color.Black)
-            VueloTextField(
-                value = aerolinea,
-                onValueChange = { aerolinea = it },
-                placeholder = "Ej. Avianca",
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
+            FormOutlinedButton(
+                text = if (modo == "editar") "Actualizar" else "Agregar",
+                onClick = ejecutarGuardado
             )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Text(text = "Precio", fontWeight = FontWeight.Bold, color = Color.Black)
-            VueloTextField(
-                value = precio,
-                onValueChange = { precio = it },
-                placeholder = "Ej. 250.00",
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next)
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(text = "Origen", fontWeight = FontWeight.Bold, color = Color.Black)
-                    VueloTextField(
-                        value = origen,
-                        onValueChange = { origen = it },
-                        placeholder = "Nicaragua",
-                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
-                    )
-                }
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(text = "Destino", fontWeight = FontWeight.Bold, color = Color.Black)
-                    VueloTextField(
-                        value = destino,
-                        onValueChange = { destino = it },
-                        placeholder = "Costa Rica",
-                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // Campos de Texto con Calendario
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(text = "Fecha salida", fontWeight = FontWeight.Bold, color = Color.Black)
-                    VueloDateField(
-                        value = fechaSalida,
-                        onDateSelected = { fechaSalida = it },
-                        placeholder = "dd/mm/aaaa"
-                    )
-                }
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(text = "Fecha entrada", fontWeight = FontWeight.Bold, color = Color.Black)
-                    VueloDateField(
-                        value = fechaEntrada,
-                        onDateSelected = { fechaEntrada = it },
-                        placeholder = "dd/mm/aaaa"
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // 🚀 BOTÓN AGREGAR / ACTUALIZAR
-            Box(
-                modifier = Modifier
-                    .wrapContentWidth()
-                    .clickable { ejecutarGuardado() }
-            ) {
-                FormOutlinedButton(
-                    text = if (modo == "editar") "Actualizar" else "Agregar",
-                    onClick = ejecutarGuardado
-                )
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // Fila de botones Limpiar y Cancelar
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                FormOutlinedButton(
-                    text = "Limpiar",
-                    onClick = {
-                        aerolinea = ""; precio = ""; origen = ""; destino = ""; fechaSalida = ""; fechaEntrada = ""
-                    }
-                )
-
-                FormOutlinedButton(
-                    text = "Cancelar",
-                    onClick = onNavigateBack
-                )
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
         }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // --- Campos de texto del formulario ---
+        Text(text = "Aerolínea", fontWeight = FontWeight.Bold, color = Color.Black)
+        VueloTextField(
+            value = aerolinea,
+            onValueChange = { aerolinea = it },
+            placeholder = "Ej. Avianca",
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Text(text = "Precio", fontWeight = FontWeight.Bold, color = Color.Black)
+        VueloTextField(
+            value = precio,
+            onValueChange = { precio = it },
+            placeholder = "Ej. 250.00",
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next)
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(text = "Origen", fontWeight = FontWeight.Bold, color = Color.Black)
+                VueloTextField(
+                    value = origen,
+                    onValueChange = { origen = it },
+                    placeholder = "Nicaragua",
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
+                )
+            }
+            Column(modifier = Modifier.weight(1f)) {
+                Text(text = "Destino", fontWeight = FontWeight.Bold, color = Color.Black)
+                VueloTextField(
+                    value = destino,
+                    onValueChange = { destino = it },
+                    placeholder = "Costa Rica",
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Campos de Fecha
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(text = "Fecha salida", fontWeight = FontWeight.Bold, color = Color.Black)
+                VueloDateField(
+                    value = fechaSalida,
+                    onDateSelected = { fechaSalida = it },
+                    placeholder = "dd/mm/aaaa"
+                )
+            }
+            Column(modifier = Modifier.weight(1f)) {
+                Text(text = "Fecha entrada", fontWeight = FontWeight.Bold, color = Color.Black)
+                VueloDateField(
+                    value = fechaEntrada,
+                    onDateSelected = { fechaEntrada = it },
+                    placeholder = "dd/mm/aaaa"
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        // --- Botones Secundarios (Limpiar y Cancelar) ---
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            FormOutlinedButton(
+                text = "limpiar",
+                onClick = {
+                    aerolinea = ""; precio = ""; origen = ""; destino = ""; fechaSalida = ""; fechaEntrada = ""
+                },
+                modifier = Modifier.width(130.dp)
+            )
+
+            FormOutlinedButton(
+                text = "Cancelar",
+                onClick = onNavigateBack,
+                modifier = Modifier.width(130.dp)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(32.dp))
 
         // --- Botón de Retroceso Inferior ---
         IconButton(
             onClick = onNavigateBack,
-            modifier = Modifier.padding(bottom = 4.dp)
+            modifier = Modifier
+                .align(Alignment.Start)
+                .padding(bottom = 8.dp)
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
@@ -335,16 +340,19 @@ fun VueloTextField(
     )
 }
 
+//  Modificamos el botón para aceptar anchos dinámicos (modifier)
 @Composable
 fun FormOutlinedButton(
     text: String,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     OutlinedButton(
         onClick = onClick,
         shape = RoundedCornerShape(8.dp),
         border = BorderStroke(1.dp, Color.Black),
-        colors = ButtonDefaults.outlinedButtonColors(containerColor = Color.White)
+        colors = ButtonDefaults.outlinedButtonColors(containerColor = Color.White),
+        modifier = modifier
     ) {
         Text(
             text = text,
