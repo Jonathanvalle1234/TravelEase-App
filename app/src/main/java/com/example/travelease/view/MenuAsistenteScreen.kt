@@ -19,20 +19,33 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.travelease.R
 import com.example.travelease.viewmodel.ClienteViewModel
+// 🚀 1. NUEVAS IMPORTACIONES
+import com.example.travelease.viewmodel.TransporteViewModel
+import com.example.travelease.viewmodel.VueloViewModel
 
 @Composable
 fun MenuAsistenteScreen(
-    viewModel: ClienteViewModel = viewModel(),
+    // 🚀 2. INYECTAMOS LOS VIEWMODELS
+    clienteViewModel: ClienteViewModel = viewModel(),
+    transporteViewModel: TransporteViewModel = viewModel(),
+    vueloViewModel: VueloViewModel = viewModel(),
     onNavigateToClientes: () -> Unit,
-    onNavigateToServicios: () -> Unit, // 🚀 1. AGREGAMOS EL PARÁMETRO AQUÍ
+    onNavigateToServicios: () -> Unit,
     onCerrarSesion: () -> Unit
 ) {
-    // 1. Obtenemos la lista de clientes en tiempo real desde el ViewModel
-    val listaClientes by viewModel.listaClientes.collectAsState()
+    // 3. Obtenemos las listas en tiempo real
+    val listaClientes by clienteViewModel.listaClientes.collectAsState()
+    val listaTransportes by transporteViewModel.transportes.collectAsState()
+    val listaVuelos by vueloViewModel.vuelos.collectAsState()
 
-    // 2. Cargamos los clientes automáticamente al abrir la pantalla para obtener el total real
+    // 🚀 4. CALCULAMOS EL TOTAL DE SERVICIOS DINÁMICAMENTE
+    val totalServicios = listaTransportes.size + listaVuelos.size
+
+    // 5. Cargamos todos los datos automáticamente al abrir la pantalla
     LaunchedEffect(Unit) {
-        viewModel.cargarClientes()
+        clienteViewModel.cargarClientes()
+        transporteViewModel.cargarTransportes()
+        vueloViewModel.cargarVuelos()
     }
 
     Column(
@@ -67,24 +80,25 @@ fun MenuAsistenteScreen(
                 }
                 DashboardCard(
                     titulo = "Servicios",
-                    cantidad = "15", // Más adelante podemos hacer que este número sea dinámico también
+                    // 🚀 6. PONEMOS LA VARIABLE REAL AQUÍ
+                    cantidad = totalServicios.toString(),
                     iconoRes = R.drawable.icono_servicios,
                     modifier = Modifier.weight(1f)
                 ) {
-                    onNavigateToServicios() // 🚀 2. SE LO ASIGNAMOS AL CLIC DE LA TARJETA
+                    onNavigateToServicios()
                 }
             }
             Spacer(modifier = Modifier.height(16.dp))
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 DashboardCard(
                     titulo = "Paquetes",
-                    cantidad = "10",
+                    cantidad = "10", // Pendiente para cuando hagas los paquetes
                     iconoRes = R.drawable.icono_paquete_turisticos,
                     modifier = Modifier.weight(1f)
                 ) { }
                 DashboardCard(
                     titulo = "Reservas",
-                    cantidad = "5",
+                    cantidad = "5", // Pendiente para cuando hagas las reservas
                     iconoRes = R.drawable.icono_reservas,
                     modifier = Modifier.weight(1f)
                 ) { }
