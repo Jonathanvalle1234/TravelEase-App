@@ -110,7 +110,6 @@ interface TravelEaseApi {
         @Path("id") id: Int
     ): Response<Void>
 
-    // 🚀 CORREGIDO: "catalogos" en lugar de "catalogs" (como lo tienes en Bruno)
     @GET("api/catalogos/type-transports/")
     suspend fun obtenerTiposTransporte(
         @Header("Authorization") token: String
@@ -146,4 +145,29 @@ interface TravelEaseApi {
         @Header("Authorization") token: String,
         @Path("id") id: Int
     ): Response<Void>
+
+    // --- RUTAS DE HOTELES ---
+    @GET("api/services/hotels/")
+    suspend fun obtenerHoteles(@Header("Authorization") token: String): retrofit2.Response<List<com.example.travelease.model.Hotel>>
+
+    @POST("api/services/hotels/")
+    suspend fun crearHotel(@Header("Authorization") token: String, @Body hotel: com.example.travelease.model.HotelRequest): retrofit2.Response<com.example.travelease.model.Hotel>
+
+    // 🔥 CORRECCIÓN APLICADA: Ahora recibe java.util.HashMap para permitir enviar solo los campos editados
+    @PATCH("api/services/hotels/{id}/")
+    suspend fun actualizarHotel(
+        @Header("Authorization") token: String,
+        @Path("id") id: Int,
+        @Body hotel: java.util.HashMap<String, Any>
+    ): retrofit2.Response<com.example.travelease.model.Hotel>
+
+    @DELETE("api/services/hotels/{id}/")
+    suspend fun eliminarHotel(@Header("Authorization") token: String, @Path("id") id: Int): retrofit2.Response<Unit>
+
+    @POST("api/services/hotels/{id}/prices/")
+    suspend fun actualizarPrecioHotel(
+        @Header("Authorization") token: String,
+        @Path("id") id: Int,
+        @Body precio: com.example.travelease.model.PrecioRequest
+    ): retrofit2.Response<Unit>
 }

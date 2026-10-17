@@ -32,9 +32,14 @@ import com.example.travelease.view.ServiciosMenuScreen
 import com.example.travelease.view.VuelosListScreen
 import com.example.travelease.view.VueloFormScreen
 
-// 🚀 NUEVO: IMPORTAMOS PANTALLAS DE TRANSPORTE
+// IMPORTAMOS PANTALLAS DE TRANSPORTE
 import com.example.travelease.view.TransportesListScreen
 import com.example.travelease.view.TransporteFormScreen
+
+// IMPORTAMOS PANTALLAS Y VIEWMODEL DE HOTELES
+import com.example.travelease.view.HotelesListScreen
+import com.example.travelease.view.HotelFormScreen
+import com.example.travelease.viewmodel.HotelViewModel
 
 // 1. CLASE SEALED MEJORADA: Ahora acepta el ID en la ruta
 sealed class RutasAsistente(val ruta: String) {
@@ -52,11 +57,16 @@ sealed class RutasAsistente(val ruta: String) {
         fun crearRuta(modo: String, id: Int = 0) = "formulario_vuelo/$modo/$id"
     }
 
-    // 🚀 2. NUEVAS RUTAS PARA TRANSPORTES
     object ListaTransportes : RutasAsistente("lista_transportes")
 
     object FormularioTransporte : RutasAsistente("formulario_transporte/{modo}/{id}") {
         fun crearRuta(modo: String, id: Int = 0) = "formulario_transporte/$modo/$id"
+    }
+
+    object ListaHoteles : RutasAsistente("lista_hoteles")
+
+    object FormularioHotel : RutasAsistente("formulario_hotel/{modo}/{id}") {
+        fun crearRuta(modo: String, id: Int = 0) = "formulario_hotel/$modo/$id"
     }
 }
 
@@ -64,8 +74,9 @@ sealed class RutasAsistente(val ruta: String) {
 fun AppNavigation() {
     val navController = rememberNavController()
 
-    // 🚀 NUEVO: Creamos un ViewModel compartido para todo el módulo de transportes
+    // Creamos los ViewModels compartidos para los módulos
     val transporteViewModel: com.example.travelease.viewmodel.TransporteViewModel = viewModel()
+    val hotelViewModel: HotelViewModel = viewModel()
 
     NavHost(navController = navController, startDestination = "login") {
 
@@ -182,8 +193,7 @@ fun AppNavigation() {
                     navController.navigate(RutasAsistente.ListaTransportes.ruta)
                 },
                 onNavigateToHoteles = {
-                    /* TODO: navController.navigate("lista_hoteles") */
-                    println("Navegando a Hoteles")
+                    navController.navigate(RutasAsistente.ListaHoteles.ruta)
                 },
                 onBackClick = { navController.popBackStack() }
             )
@@ -218,7 +228,7 @@ fun AppNavigation() {
         // --- 🚌 MÓDULO DE TRANSPORTES ---
         composable(RutasAsistente.ListaTransportes.ruta) {
             TransportesListScreen(
-                viewModel = transporteViewModel, // 🚀 Le pasamos el compartido
+                viewModel = transporteViewModel,
                 onNavigateBack = { navController.popBackStack() },
                 onNavigateToAgregar = {
                     navController.navigate(RutasAsistente.FormularioTransporte.crearRuta("crear", 0))
@@ -242,7 +252,39 @@ fun AppNavigation() {
             TransporteFormScreen(
                 modo = modo,
                 transporteId = id,
-                viewModel = transporteViewModel, // 🚀 Le pasamos el mismo compartido
+                viewModel = transporteViewModel,
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        // --- 🏨 MÓDULO DE HOTELES ---
+        composable(RutasAsistente.ListaHoteles.ruta) {
+            HotelesListScreen(
+                viewModel = hotelViewModel,
+                onNavigateToForm = { idHotel ->
+                    if (idHotel == null) {
+                        navController.navigate(RutasAsistente.FormularioHotel.crearRuta("crear", 0))
+                    } else {
+                        navController.navigate(RutasAsistente.FormularioHotel.crearRuta("editar", idHotel))
+                    }
+                },
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(
+            route = RutasAsistente.FormularioHotel.ruta,
+            arguments = listOf(
+                navArgument("modo") { type = NavType.StringType },
+                navArgument("id") { type = NavType.IntType }
+            )
+        ) { backStackEntry ->
+            val modo = backStackEntry.arguments?.getString("modo") ?: "crear"
+            val id = backStackEntry.arguments?.getInt("id") ?: 0
+
+            HotelFormScreen(
+                viewModel = hotelViewModel,
+                hotelId = if (modo == "crear") null else id,
                 onNavigateBack = { navController.popBackStack() }
             )
         }
