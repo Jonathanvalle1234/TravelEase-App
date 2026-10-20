@@ -69,7 +69,7 @@ interface TravelEaseApi {
     suspend fun actualizarCliente(
         @Header("Authorization") token: String,
         @Path("id") id: Int,
-        @Body cliente: ClienteRequestDto
+        @Body cliente: ClienteActualizarRequestDto
     ): retrofit2.Response<ClienteDto>
 
     @GET("api/services/flights/")

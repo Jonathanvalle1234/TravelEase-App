@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.travelease.model.ClienteActualizarRequestDto
 import com.example.travelease.model.ClienteDto
 import com.example.travelease.model.ClienteRequestDto
 import com.example.travelease.model.EncuestaDto
@@ -183,7 +184,6 @@ class ClienteViewModel : ViewModel() {
         clienteId: Int,
         nombre: String,
         cedula: String,
-        correo: String, // 🚀 AHORA RECIBE EL CORREO DIRECTO DE LA PANTALLA
         direccion: String,
         telefono: String,
         departamentoStr: String,
@@ -195,9 +195,8 @@ class ClienteViewModel : ViewModel() {
             try {
                 val munId = municipioStr.toIntOrNull() ?: 1
 
-                val request = ClienteRequestDto(
+                val request = ClienteActualizarRequestDto(
                     name = nombre,
-                    userEmail = correo, // Le mandamos el correo que está en el formulario
                     nationalId = cedula,
                     address = direccion,
                     phoneNumber = telefono,

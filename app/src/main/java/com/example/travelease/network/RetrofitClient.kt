@@ -6,7 +6,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 object RetrofitClient {
 
 
-    private const val BASE_URL = "http://172.25.50.12:8000/"
+    private const val BASE_URL = " https://travel-ease-api-dpbkcyd3a8cse3gg.mexicocentral-01.azurewebsites.net/"
 
     val apiService: TravelEaseApi by lazy {
         Retrofit.Builder()

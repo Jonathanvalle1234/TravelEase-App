@@ -75,10 +75,10 @@ fun ClienteFormScreen(
 
     val listaClientes by viewModel.listaClientes.collectAsState()
 
-    // 🚀 CONTROL: Para saber si ya llenamos los datos y no borrar tus ediciones
+    //  CONTROL: Para saber si ya llenamos los datos y no borrar tus ediciones
     var datosLlenados by remember { mutableStateOf(false) }
 
-    // 🚀 MAGIA CORREGIDA: Escuchamos cambios en la lista de clientes
+    //  MAGIA CORREGIDA: Escuchamos cambios en la lista de clientes
     LaunchedEffect(clienteId, listaClientes) {
         if (!esCrear && clienteId > 0 && !datosLlenados) {
 
@@ -299,7 +299,7 @@ fun ClienteFormScreen(
                                     clienteId = clienteId,
                                     nombre = nombre,
                                     cedula = cedula,
-                                    correo = correo, // 🚀 ¡AQUÍ MANDAMOS EL CORREO!
+//                                    correo = correo, // 🚀 ¡AQUÍ MANDAMOS EL CORREO!
                                     direccion = direccion,
                                     telefono = telefono,
                                     departamentoStr = depIdStr,

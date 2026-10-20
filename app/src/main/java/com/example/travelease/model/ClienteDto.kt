@@ -33,3 +33,12 @@ data class ClienteRequestDto(
     val municipality: Int
     // department_id eliminado porque el POST de Django no lo pide en el cuerpo
 )
+
+data class ClienteActualizarRequestDto(
+    val name: String,
+    @SerializedName("national_id") val nationalId: String,
+    val address: String,
+    @SerializedName("phone_number") val phoneNumber: String,
+    val municipality: Int
+    // department_id eliminado porque el POST de Django no lo pide en el cuerpo
+)
