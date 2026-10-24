@@ -1,16 +1,24 @@
 package com.example.travelease.navigation
 
+import android.widget.Toast
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.lifecycle.viewmodel.compose.viewModel
 
-// Importaciones de tus pantallas
+// Pantallas
 import com.example.travelease.view.LoginScreen
 import com.example.travelease.view.ClienteScreen
 import com.example.travelease.view.GerenciaScreen
@@ -28,24 +36,36 @@ import com.example.travelease.view.ClientesListScreen
 import com.example.travelease.view.ClienteFormScreen
 import com.example.travelease.view.ServiciosMenuScreen
 
-// Importamos pantallas de vuelos
+// Vuelos
 import com.example.travelease.view.VuelosListScreen
 import com.example.travelease.view.VueloFormScreen
 
-// IMPORTAMOS PANTALLAS DE TRANSPORTE
+// Transporte
 import com.example.travelease.view.TransportesListScreen
 import com.example.travelease.view.TransporteFormScreen
 
-// IMPORTAMOS PANTALLAS Y VIEWMODEL DE HOTELES
+// Hoteles
 import com.example.travelease.view.HotelesListScreen
 import com.example.travelease.view.HotelFormScreen
 import com.example.travelease.viewmodel.HotelViewModel
 
-// 1. CLASE SEALED MEJORADA: Ahora acepta el ID en la ruta
+// Reservas
+import com.example.travelease.view.ReservaPanelScreen
+import com.example.travelease.view.CrearReservaScreen
+import com.example.travelease.view.EditarReservaScreen
+import com.example.travelease.model.ReservaRequest
+import com.example.travelease.viewmodel.ReservaPanelViewModel
+
 sealed class RutasAsistente(val ruta: String) {
     object MenuAsistente : RutasAsistente("menu_asistente")
     object ListaClientes : RutasAsistente("lista_clientes")
     object ServiciosMenu : RutasAsistente("servicios_menu")
+    object PanelReservas : RutasAsistente("panel_reservas")
+    object CrearReserva : RutasAsistente("crear_reserva")
+
+    object EditarReserva : RutasAsistente("editar_reserva/{id}") {
+        fun crearRuta(id: Int) = "editar_reserva/$id"
+    }
 
     object FormularioCliente : RutasAsistente("formulario_cliente/{modo}/{id}") {
         fun crearRuta(modo: String, id: Int = 0) = "formulario_cliente/$modo/$id"
@@ -74,13 +94,13 @@ sealed class RutasAsistente(val ruta: String) {
 fun AppNavigation() {
     val navController = rememberNavController()
 
-    // Creamos los ViewModels compartidos para los módulos
     val transporteViewModel: com.example.travelease.viewmodel.TransporteViewModel = viewModel()
     val hotelViewModel: HotelViewModel = viewModel()
+    val reservaPanelViewModel: ReservaPanelViewModel = viewModel()
 
     NavHost(navController = navController, startDestination = "login") {
 
-        // --- 1. RUTA DE INGRESO ---
+        // --- 1. LOGIN ---
         composable("login") {
             LoginScreen(
                 onNavigateToCliente = { navController.navigate("cliente") },
@@ -89,7 +109,7 @@ fun AppNavigation() {
             )
         }
 
-        // --- 2. RUTAS DEL CLIENTE ---
+        // --- 2. CLIENTE ---
         composable("cliente") {
             ClienteScreen(
                 onNavigateBack = { navController.popBackStack() },
@@ -122,7 +142,7 @@ fun AppNavigation() {
             val factura = backStackEntry.arguments?.getString("factura") ?: ""
             val total = backStackEntry.arguments?.getString("total") ?: ""
 
-            val viewModel: ClienteViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+            val viewModel: ClienteViewModel = viewModel()
 
             ValoracionesScreen(
                 viewModel = viewModel,
@@ -148,7 +168,7 @@ fun AppNavigation() {
             )
         }
 
-        // --- 3. RUTAS DE GERENCIA ---
+        // --- 3. GERENCIA ---
         composable("gerencia") {
             GerenciaScreen(
                 onNavigateBack = { navController.popBackStack() },
@@ -170,12 +190,12 @@ fun AppNavigation() {
             TopClientesScreen(onNavigateBack = { navController.popBackStack() })
         }
 
-        // --- 4. RUTAS DEL ASISTENTE ---
-
+        // --- 4. ASISTENTE ---
         composable(RutasAsistente.MenuAsistente.ruta) {
             MenuAsistenteScreen(
                 onNavigateToClientes = { navController.navigate(RutasAsistente.ListaClientes.ruta) },
                 onNavigateToServicios = { navController.navigate(RutasAsistente.ServiciosMenu.ruta) },
+                onNavigateToReservas = { navController.navigate(RutasAsistente.PanelReservas.ruta) },
                 onCerrarSesion = {
                     navController.navigate("login") {
                         popUpTo("login") { inclusive = true }
@@ -184,22 +204,141 @@ fun AppNavigation() {
             )
         }
 
+        // --- 📋 PANEL DE RESERVAS ---
+        composable(RutasAsistente.PanelReservas.ruta) {
+            ReservaPanelScreen(
+                viewModel = reservaPanelViewModel,
+                token = ClienteViewModel.authToken,
+                onNavigateToAgregar = { navController.navigate(RutasAsistente.CrearReserva.ruta) },
+                onNavigateToEditar = { idReserva ->
+                    navController.navigate(RutasAsistente.EditarReserva.crearRuta(idReserva))
+                },
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        // --- ➕ CREAR RESERVA ---
+        composable(RutasAsistente.CrearReserva.ruta) {
+            val context = LocalContext.current
+            val token = ClienteViewModel.authToken
+            val clientes by reservaPanelViewModel.clientes.collectAsState()
+            val paquetes by reservaPanelViewModel.paquetes.collectAsState()
+            val estados by reservaPanelViewModel.estados.collectAsState()
+            val tiposPago by reservaPanelViewModel.tiposPago.collectAsState()
+
+            LaunchedEffect(Unit) { reservaPanelViewModel.cargarCatalogos(token) }
+
+            CrearReservaScreen(
+                clientes = clientes,
+                paquetes = paquetes,
+                estados = estados,
+                tiposPago = tiposPago,
+                onAgregar = { clienteId, paqueteId, estadoId, pagoId ->
+                    reservaPanelViewModel.crearReserva(
+                        token = token,
+                        request = ReservaRequest(
+                            clientId = clienteId,
+                            packageId = paqueteId,
+                            paymentTypeId = pagoId,
+                            statusId = estadoId
+                        )
+                    ) { exito ->
+                        if (exito) {
+                            Toast.makeText(context, "✅ Reserva agregada con éxito", Toast.LENGTH_SHORT).show()
+                            navController.popBackStack()
+                        } else {
+                            val detalle = reservaPanelViewModel.errorMessage.value ?: "Error desconocido"
+                            Toast.makeText(context, "❌ $detalle", Toast.LENGTH_LONG).show()
+                        }
+                    }
+                },
+                onCancelar = { navController.popBackStack() }
+            )
+        }
+
+        // --- ✏️ EDITAR RESERVA ---
+        composable(
+            route = RutasAsistente.EditarReserva.ruta,
+            arguments = listOf(navArgument("id") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val context = LocalContext.current
+            val token = ClienteViewModel.authToken
+            val idReserva = backStackEntry.arguments?.getInt("id") ?: 0
+
+            val clientes by reservaPanelViewModel.clientes.collectAsState()
+            val paquetes by reservaPanelViewModel.paquetes.collectAsState()
+            val estados by reservaPanelViewModel.estados.collectAsState()
+            val tiposPago by reservaPanelViewModel.tiposPago.collectAsState()
+            val reservas by reservaPanelViewModel.reservas.collectAsState()
+
+            val reservaActual = reservas.find { it.id == idReserva }
+
+            LaunchedEffect(Unit) {
+                reservaPanelViewModel.cargarCatalogos(token)
+                if (reservas.isEmpty()) {
+                    reservaPanelViewModel.cargarReservas(token)
+                }
+            }
+
+            if (reservaActual == null) {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            } else {
+                val estadoInicial = reservaActual.currentStatus?.id ?: 0
+
+                EditarReservaScreen(
+                    clientes = clientes,
+                    paquetes = paquetes,
+                    estados = estados,
+                    tiposPago = tiposPago,
+                    clienteInicialId = reservaActual.clienteId ?: 0,
+                    paqueteInicialId = reservaActual.paqueteId ?: 0,
+                    estadoInicialId = estadoInicial,
+                    pagoInicialId = reservaActual.tipoPagoId ?: 0,
+                    paqueteInicialNombre = reservaActual.paqueteNombre,
+                    estadoBloqueado = !reservaActual.estado.equals("Pendiente", true),
+                    onActualizar = { clienteId, paqueteId, estadoId, pagoId ->
+                        // PUT: solo cliente, paquete, pago y vendedor (el estado va aparte)
+                        val campos = hashMapOf<String, Any>(
+                            "client" to clienteId,
+                            "package_id" to paqueteId,
+                            "payment_type" to pagoId,
+                            "seller_user" to (reservaActual.sellerUserId ?: 1)
+                        )
+                        val estadoCambio = estadoId != estadoInicial
+
+                        reservaPanelViewModel.editarReserva(
+                            token = token,
+                            id = idReserva,
+                            campos = campos,
+                            estadoNuevoId = if (estadoCambio) estadoId else null
+                        ) { exito, mensaje ->
+                            if (exito) {
+                                Toast.makeText(context, "✅ Reserva actualizada con éxito", Toast.LENGTH_SHORT).show()
+                                navController.popBackStack()
+                            } else {
+                                Toast.makeText(context, "❌ ${mensaje ?: "Error desconocido"}", Toast.LENGTH_LONG).show()
+                            }
+                        }
+                    },
+                    onLimpiar = {},
+                    onCancelar = { navController.popBackStack() },
+                    onBackClick = { navController.popBackStack() }
+                )
+            }
+        }
+
         composable(RutasAsistente.ServiciosMenu.ruta) {
             ServiciosMenuScreen(
-                onNavigateToVuelos = {
-                    navController.navigate(RutasAsistente.ListaVuelos.ruta)
-                },
-                onNavigateToTransporte = {
-                    navController.navigate(RutasAsistente.ListaTransportes.ruta)
-                },
-                onNavigateToHoteles = {
-                    navController.navigate(RutasAsistente.ListaHoteles.ruta)
-                },
+                onNavigateToVuelos = { navController.navigate(RutasAsistente.ListaVuelos.ruta) },
+                onNavigateToTransporte = { navController.navigate(RutasAsistente.ListaTransportes.ruta) },
+                onNavigateToHoteles = { navController.navigate(RutasAsistente.ListaHoteles.ruta) },
                 onBackClick = { navController.popBackStack() }
             )
         }
 
-        // --- ✈️ MÓDULO DE VUELOS ---
+        // --- ✈️ VUELOS ---
         composable(RutasAsistente.ListaVuelos.ruta) {
             VuelosListScreen(
                 onNavigateBack = { navController.popBackStack() },
@@ -225,7 +364,7 @@ fun AppNavigation() {
             VueloFormScreen(modo = modo, vueloId = id, onNavigateBack = { navController.popBackStack() })
         }
 
-        // --- 🚌 MÓDULO DE TRANSPORTES ---
+        // --- 🚌 TRANSPORTES ---
         composable(RutasAsistente.ListaTransportes.ruta) {
             TransportesListScreen(
                 viewModel = transporteViewModel,
@@ -257,7 +396,7 @@ fun AppNavigation() {
             )
         }
 
-        // --- 🏨 MÓDULO DE HOTELES ---
+        // --- 🏨 HOTELES ---
         composable(RutasAsistente.ListaHoteles.ruta) {
             HotelesListScreen(
                 viewModel = hotelViewModel,
@@ -289,7 +428,7 @@ fun AppNavigation() {
             )
         }
 
-        // --- 👤 MÓDULO DE CLIENTES ---
+        // --- 👤 CLIENTES ---
         composable(RutasAsistente.ListaClientes.ruta) {
             ClientesListScreen(
                 onNavigateToNuevo = {
