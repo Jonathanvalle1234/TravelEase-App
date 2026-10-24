@@ -59,4 +59,5 @@ dependencies {
 
     // Integración de ViewModel con Compose
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.11.0") // O la versión de okhttp que estés usando
 }

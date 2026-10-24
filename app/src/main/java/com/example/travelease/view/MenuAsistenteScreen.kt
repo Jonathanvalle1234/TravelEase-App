@@ -19,33 +19,39 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.travelease.R
 import com.example.travelease.viewmodel.ClienteViewModel
-// 🚀 1. NUEVAS IMPORTACIONES
+import com.example.travelease.viewmodel.ReservaPanelViewModel
 import com.example.travelease.viewmodel.TransporteViewModel
 import com.example.travelease.viewmodel.VueloViewModel
 
 @Composable
 fun MenuAsistenteScreen(
-    // 🚀 2. INYECTAMOS LOS VIEWMODELS
     clienteViewModel: ClienteViewModel = viewModel(),
     transporteViewModel: TransporteViewModel = viewModel(),
     vueloViewModel: VueloViewModel = viewModel(),
+    reservaPanelViewModel: ReservaPanelViewModel = viewModel(), // <--- ViewModel de reservas integrado
     onNavigateToClientes: () -> Unit,
     onNavigateToServicios: () -> Unit,
+    onNavigateToReservas: () -> Unit,
     onCerrarSesion: () -> Unit
 ) {
-    // 3. Obtenemos las listas en tiempo real
+    // Obtenemos las listas en tiempo real (incluyendo reservas)
     val listaClientes by clienteViewModel.listaClientes.collectAsState()
     val listaTransportes by transporteViewModel.transportes.collectAsState()
     val listaVuelos by vueloViewModel.vuelos.collectAsState()
+    val listaReservas by reservaPanelViewModel.reservas.collectAsState() // <--- Estado de reservas
 
-    // 🚀 4. CALCULAMOS EL TOTAL DE SERVICIOS DINÁMICAMENTE
+    // Token actual para las consultas autenticadas
+    val token = ClienteViewModel.authToken
+
+    // Calculamos el total de servicios dinámicamente
     val totalServicios = listaTransportes.size + listaVuelos.size
 
-    // 5. Cargamos todos los datos automáticamente al abrir la pantalla
+    // Cargamos todos los datos automáticamente al abrir la pantalla
     LaunchedEffect(Unit) {
         clienteViewModel.cargarClientes()
         transporteViewModel.cargarTransportes()
         vueloViewModel.cargarVuelos()
+        reservaPanelViewModel.cargarReservas(token) // <--- Carga automática de reservas reales
     }
 
     Column(
@@ -80,7 +86,6 @@ fun MenuAsistenteScreen(
                 }
                 DashboardCard(
                     titulo = "Servicios",
-                    // 🚀 6. PONEMOS LA VARIABLE REAL AQUÍ
                     cantidad = totalServicios.toString(),
                     iconoRes = R.drawable.icono_servicios,
                     modifier = Modifier.weight(1f)
@@ -92,16 +97,20 @@ fun MenuAsistenteScreen(
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 DashboardCard(
                     titulo = "Paquetes",
-                    cantidad = "10", // Pendiente para cuando hagas los paquetes
+                    cantidad = "10",
                     iconoRes = R.drawable.icono_paquete_turisticos,
                     modifier = Modifier.weight(1f)
                 ) { }
+
+                // Tarjeta de Reservas conectada a la cantidad real obtenida del servidor
                 DashboardCard(
                     titulo = "Reservas",
-                    cantidad = "5", // Pendiente para cuando hagas las reservas
+                    cantidad = listaReservas.size.toString(), // <--- Muestra el tamaño real de la lista
                     iconoRes = R.drawable.icono_reservas,
                     modifier = Modifier.weight(1f)
-                ) { }
+                ) {
+                    onNavigateToReservas()
+                }
             }
         }
 

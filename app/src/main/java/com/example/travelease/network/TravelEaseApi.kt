@@ -1,19 +1,26 @@
 package com.example.travelease.network
 
+import com.example.travelease.model.CatalogoItemDto
 import com.example.travelease.model.ClienteDto
 import com.example.travelease.model.ClienteRequestDto
 import com.example.travelease.model.EncuestaDto
+import com.example.travelease.model.Hotel
+import com.example.travelease.model.HotelRequest
 import com.example.travelease.model.LoginDto
 import com.example.travelease.model.LoginResponse
+import com.example.travelease.model.PrecioRequest
 import com.example.travelease.model.Reserva
+import com.example.travelease.model.ReservaAdminDto
+import com.example.travelease.model.ReservaRequest
 import com.example.travelease.model.SugerenciaDto
+import com.example.travelease.model.TipoTransporte
 import com.example.travelease.model.Transporte
 import com.example.travelease.model.TransporteRequest
 import com.example.travelease.model.TransporteUpdateDto
 import com.example.travelease.model.ValoracionDto
 import com.example.travelease.model.Vuelo
+import com.example.travelease.model.VueloRequestDto
 import com.example.travelease.model.VueloUpdateDto
-import com.example.travelease.model.*
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -23,7 +30,7 @@ import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
-
+import okhttp3.ResponseBody
 interface TravelEaseApi {
 
     @GET("api/clients-mobile/reservas/")
@@ -51,7 +58,7 @@ interface TravelEaseApi {
     suspend fun postEncuestaSatisfaccion(
         @Header("Authorization") token: String,
         @Body encuesta: EncuestaDto
-    ): retrofit2.Response<Void>
+    ): Response<Void>
 
     @POST("api/clients-mobile/valoracion/")
     suspend fun enviarValoracionBackend(
@@ -70,7 +77,7 @@ interface TravelEaseApi {
         @Header("Authorization") token: String,
         @Path("id") id: Int,
         @Body cliente: ClienteRequestDto
-    ): retrofit2.Response<ClienteDto>
+    ): Response<ClienteDto>
 
     @GET("api/services/flights/")
     suspend fun obtenerVuelos(
@@ -80,14 +87,14 @@ interface TravelEaseApi {
     @POST("api/services/flights/")
     suspend fun crearVuelo(
         @Header("Authorization") token: String,
-        @Body vuelo: com.example.travelease.model.VueloRequestDto
+        @Body vuelo: VueloRequestDto
     ): Response<Vuelo>
 
     @PUT("api/services/flights/{id}/")
     suspend fun actualizarVuelo(
         @Header("Authorization") token: String,
         @Path("id") id: Int,
-        @Body vuelo: com.example.travelease.model.VueloRequestDto
+        @Body vuelo: VueloRequestDto
     ): Response<Vuelo>
 
     @POST("api/services/flights/{id}/prices/")
@@ -148,26 +155,93 @@ interface TravelEaseApi {
 
     // --- RUTAS DE HOTELES ---
     @GET("api/services/hotels/")
-    suspend fun obtenerHoteles(@Header("Authorization") token: String): retrofit2.Response<List<com.example.travelease.model.Hotel>>
+    suspend fun obtenerHoteles(@Header("Authorization") token: String): Response<List<Hotel>>
 
     @POST("api/services/hotels/")
-    suspend fun crearHotel(@Header("Authorization") token: String, @Body hotel: com.example.travelease.model.HotelRequest): retrofit2.Response<com.example.travelease.model.Hotel>
+    suspend fun crearHotel(@Header("Authorization") token: String, @Body hotel: HotelRequest): Response<Hotel>
 
-    // 🔥 CORRECCIÓN APLICADA: Ahora recibe java.util.HashMap para permitir enviar solo los campos editados
     @PATCH("api/services/hotels/{id}/")
     suspend fun actualizarHotel(
         @Header("Authorization") token: String,
         @Path("id") id: Int,
         @Body hotel: java.util.HashMap<String, Any>
-    ): retrofit2.Response<com.example.travelease.model.Hotel>
+    ): Response<Hotel>
 
     @DELETE("api/services/hotels/{id}/")
-    suspend fun eliminarHotel(@Header("Authorization") token: String, @Path("id") id: Int): retrofit2.Response<Unit>
+    suspend fun eliminarHotel(@Header("Authorization") token: String, @Path("id") id: Int): Response<Unit>
 
     @POST("api/services/hotels/{id}/prices/")
     suspend fun actualizarPrecioHotel(
         @Header("Authorization") token: String,
         @Path("id") id: Int,
-        @Body precio: com.example.travelease.model.PrecioRequest
-    ): retrofit2.Response<Unit>
+        @Body precio: PrecioRequest
+    ): Response<Unit>
+
+    // ====================================================================
+    // RUTAS DEL PANEL ADMINISTRATIVO DE RESERVAS
+    // ====================================================================
+
+    @GET("api/reservations/reservations/")
+    suspend fun obtenerReservasPanel(
+        @Header("Authorization") token: String
+    ): Response<List<ReservaAdminDto>>
+
+    @GET("api/reservations/reservations/{id}/")
+    suspend fun obtenerReservaPanelPorId(
+        @Header("Authorization") token: String,
+        @Path("id") id: Int
+    ): Response<ReservaAdminDto>
+
+    @POST("api/reservations/reservations/")
+    suspend fun crearReservaPanel(
+        @Header("Authorization") token: String,
+        @Body reserva: ReservaRequest
+    ): Response<ReservaAdminDto>
+
+    // PUT con client, package_id, payment_type, seller_user
+    @PUT("api/reservations/reservations/{id}/")
+    suspend fun actualizarReservaPanel(
+        @Header("Authorization") token: String,
+        @Path("id") id: Int,
+        @Body reserva: java.util.HashMap<String, Any>
+    ): Response<ReservaAdminDto>
+    // PUT con {"status_id": X}
+    @PUT("api/reservations/reservations/{id}/update_status/")
+    suspend fun actualizarEstadoReservaPanel(
+        @Header("Authorization") token: String,
+        @Path("id") id: Int,
+        @Body body: java.util.HashMap<String, Any>
+    ): Response<ResponseBody>
+    // Cambiado a PUT exactamente como lo requiere Django en update_status
+    @PUT("api/reservations/reservations/{id}/update_status/")
+    suspend fun actualizarEstadoReservaPanel(
+        @Header("Authorization") token: String,
+        @Path("id") id: Int,
+        @Body body: Map<String, @JvmSuppressWildcards Any>
+    ): Response<Void>
+
+    @DELETE("api/reservations/reservations/{id}/")
+    suspend fun eliminarReservaPanel(
+        @Header("Authorization") token: String,
+        @Path("id") id: Int
+    ): Response<Void>
+
+    // ====================================================================
+    // CATÁLOGOS PARA LAS PANTALLAS CREAR / EDITAR RESERVA
+    // ====================================================================
+
+    @GET("api/packages/")
+    suspend fun getPaquetesOpciones(
+        @Header("Authorization") token: String
+    ): Response<List<CatalogoItemDto>>
+
+    @GET("api/reservations/reservation-statuses/")
+    suspend fun getEstadosReservaOpciones(
+        @Header("Authorization") token: String
+    ): Response<List<CatalogoItemDto>>
+
+    @GET("api/reservations/payment-types/")
+    suspend fun getTiposPagoOpciones(
+        @Header("Authorization") token: String
+    ): Response<List<CatalogoItemDto>>
 }
