@@ -36,9 +36,8 @@ class ReservaPanelRepository {
         token: String,
         id: Int,
         statusId: Int
-    ): Response<ResponseBody> =
-        api.actualizarEstadoReservaPanel(auth(token), id, hashMapOf("status_id" to statusId))
-
+    ): Response<Void> = // <-- El cambio está aquí (de ResponseBody a Void)
+        api.actualizarEstadoReservaPanel(token = auth(token), id, body = hashMapOf("status_id" to statusId))
     suspend fun eliminarReserva(token: String, id: Int): Response<Void> =
         api.eliminarReservaPanel(auth(token), id)
 
