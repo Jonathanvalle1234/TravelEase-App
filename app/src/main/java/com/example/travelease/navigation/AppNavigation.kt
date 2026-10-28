@@ -39,6 +39,7 @@ import com.example.travelease.view.ServiciosMenuScreen
 // Vuelos
 import com.example.travelease.view.VuelosListScreen
 import com.example.travelease.view.VueloFormScreen
+import com.example.travelease.viewmodel.VueloViewModel
 
 // Transporte
 import com.example.travelease.view.TransportesListScreen
@@ -53,8 +54,14 @@ import com.example.travelease.viewmodel.HotelViewModel
 import com.example.travelease.view.ReservaPanelScreen
 import com.example.travelease.view.CrearReservaScreen
 import com.example.travelease.view.EditarReservaScreen
+import com.example.travelease.view.OpcionItem
 import com.example.travelease.model.ReservaRequest
 import com.example.travelease.viewmodel.ReservaPanelViewModel
+
+// Paquetes Turísticos
+import com.example.travelease.view.PaquetesListScreen
+import com.example.travelease.view.PaqueteFormScreen
+import com.example.travelease.viewmodel.PaquetesViewModel
 
 sealed class RutasAsistente(val ruta: String) {
     object MenuAsistente : RutasAsistente("menu_asistente")
@@ -88,6 +95,13 @@ sealed class RutasAsistente(val ruta: String) {
     object FormularioHotel : RutasAsistente("formulario_hotel/{modo}/{id}") {
         fun crearRuta(modo: String, id: Int = 0) = "formulario_hotel/$modo/$id"
     }
+
+    // --- Rutas de Paquetes ---
+    object ListaPaquetes : RutasAsistente("lista_paquetes")
+
+    object FormularioPaquete : RutasAsistente("formulario_paquete/{modo}/{id}") {
+        fun crearRuta(modo: String, id: Int = 0) = "formulario_paquete/$modo/$id"
+    }
 }
 
 @Composable
@@ -96,7 +110,11 @@ fun AppNavigation() {
 
     val transporteViewModel: com.example.travelease.viewmodel.TransporteViewModel = viewModel()
     val hotelViewModel: HotelViewModel = viewModel()
+    val vueloViewModel: VueloViewModel = viewModel()
     val reservaPanelViewModel: ReservaPanelViewModel = viewModel()
+
+    // ViewModel para los paquetes
+    val paquetesViewModel: PaquetesViewModel = viewModel()
 
     NavHost(navController = navController, startDestination = "login") {
 
@@ -196,11 +214,107 @@ fun AppNavigation() {
                 onNavigateToClientes = { navController.navigate(RutasAsistente.ListaClientes.ruta) },
                 onNavigateToServicios = { navController.navigate(RutasAsistente.ServiciosMenu.ruta) },
                 onNavigateToReservas = { navController.navigate(RutasAsistente.PanelReservas.ruta) },
+                onNavigateToPaquetes = { navController.navigate(RutasAsistente.ListaPaquetes.ruta) },
                 onCerrarSesion = {
                     navController.navigate("login") {
                         popUpTo("login") { inclusive = true }
                     }
                 }
+            )
+        }
+
+        // --- 🌴 PAQUETES TURÍSTICOS (Lista) ---
+        composable(RutasAsistente.ListaPaquetes.ruta) {
+            PaquetesListScreen(
+                token = ClienteViewModel.authToken,
+                viewModel = paquetesViewModel,
+                onAgregarClick = {
+                    navController.navigate(RutasAsistente.FormularioPaquete.crearRuta("crear", 0))
+                },
+                onEditClick = { paquete ->
+                    navController.navigate(RutasAsistente.FormularioPaquete.crearRuta("editar", paquete.id))
+                },
+                onDeleteClick = { paquete ->
+                    // Lógica de eliminación futura
+                },
+                onBackClick = { navController.popBackStack() }
+            )
+        }
+
+        // --- 🌴 PAQUETES TURÍSTICOS (Formulario Único: Crear / Editar con Servicios Reales) ---
+        composable(
+            route = RutasAsistente.FormularioPaquete.ruta,
+            arguments = listOf(
+                navArgument("modo") { type = NavType.StringType },
+                navArgument("id") { type = NavType.IntType }
+            )
+        ) { backStackEntry ->
+            val context = LocalContext.current
+            val modo = backStackEntry.arguments?.getString("modo") ?: "crear"
+            val id = backStackEntry.arguments?.getInt("id") ?: 0
+
+            val paqueteAEditar = if (modo == "editar") {
+                paquetesViewModel.paquetesList.find { it.id == id }
+            } else {
+                null
+            }
+
+            // 1. Hoteles reales: id + texto con precio
+            val hotelesLista by hotelViewModel.hoteles.collectAsState()
+            val opcionesHoteles = hotelesLista.map { hotel ->
+                val nombreHotel = hotel.nombre ?: "Hotel sin nombre"
+                val precioHotel = hotel.precioActual ?: 0.0
+                OpcionItem(hotel.id, "$nombreHotel - $$precioHotel")
+            }
+
+            // 2. Vuelos reales: id + texto con precio
+            val vuelosLista by vueloViewModel.vuelos.collectAsState()
+            val opcionesVuelos = vuelosLista.map {
+                OpcionItem(it.id, "${it.aerolinea} (${it.origen} ➔ ${it.destino}) - $${it.precio}")
+            }
+
+            // 3. Transportes reales: id + texto con precio
+            val transportesLista by transporteViewModel.transportes.collectAsState()
+            val opcionesTransportes = transportesLista.map { transporte ->
+                val nombreTrans = transporte.type_transport_name ?: "Transporte"
+                val precioTrans = transporte.current_price ?: 0.0
+                OpcionItem(transporte.id, "$nombreTrans - $$precioTrans")
+            }
+
+            // Carga todos los servicios reales de la BD al entrar
+            LaunchedEffect(Unit) {
+                hotelViewModel.obtenerHoteles(context)
+                vueloViewModel.cargarVuelos()
+                transporteViewModel.cargarTransportes()
+            }
+
+            PaqueteFormScreen(
+                paqueteAEditar = paqueteAEditar,
+                vuelosDisponibles = opcionesVuelos,
+                hotelesDisponibles = opcionesHoteles,
+                transportesDisponibles = opcionesTransportes,
+                onGuardarClick = { titulo, descripcion, pais, ciudad, vueloId, hotelId, transporteId ->
+                    paquetesViewModel.guardarPaquete(
+                        modo = modo,
+                        paqueteId = id,
+                        titulo = titulo,
+                        descripcion = descripcion,
+                        pais = pais,
+                        ciudad = ciudad,
+                        vueloId = vueloId,
+                        hotelId = hotelId,
+                        transporteId = transporteId,
+                        token = ClienteViewModel.authToken,
+                        onSuccess = {
+                            Toast.makeText(context, "✅ Paquete guardado con éxito", Toast.LENGTH_SHORT).show()
+                            navController.popBackStack()
+                        },
+                        onError = { errorMsg ->
+                            Toast.makeText(context, "❌ Error: $errorMsg", Toast.LENGTH_LONG).show()
+                        }
+                    )
+                },
+                onBackClick = { navController.popBackStack() }
             )
         }
 
@@ -299,7 +413,6 @@ fun AppNavigation() {
                     paqueteInicialNombre = reservaActual.paqueteNombre,
                     estadoBloqueado = !reservaActual.estado.equals("Pendiente", true),
                     onActualizar = { clienteId, paqueteId, estadoId, pagoId ->
-                        // PUT: solo cliente, paquete, pago y vendedor (el estado va aparte)
                         val campos = hashMapOf<String, Any>(
                             "client" to clienteId,
                             "package_id" to paqueteId,

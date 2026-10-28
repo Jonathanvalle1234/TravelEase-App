@@ -9,6 +9,8 @@ import com.example.travelease.model.Hotel
 import com.example.travelease.model.HotelRequest
 import com.example.travelease.model.LoginDto
 import com.example.travelease.model.LoginResponse
+import com.example.travelease.model.PaqueteDto
+import com.example.travelease.model.PaqueteRequestDto
 import com.example.travelease.model.PrecioRequest
 import com.example.travelease.model.Reserva
 import com.example.travelease.model.ReservaAdminDto
@@ -31,7 +33,6 @@ import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
-import okhttp3.ResponseBody
 
 interface TravelEaseApi {
 
@@ -240,4 +241,13 @@ interface TravelEaseApi {
     suspend fun getTiposPagoOpciones(
         @Header("Authorization") token: String
     ): Response<List<CatalogoItemDto>>
+    @GET("api/packages/")
+    suspend fun obtenerPaquetes(
+        @Header("Authorization") token: String
+    ): Response<List<PaqueteDto>> // <-- Volvemos a List<PaqueteDto>
+    @POST("api/paquetes/") // O la ruta que use tu backend
+    suspend fun crearPaquete(@Header("Authorization") token: String, @Body request: PaqueteRequestDto): Response<PaqueteDto>
+
+    @PUT("api/paquetes/{id}/")
+    suspend fun actualizarPaquete(@Header("Authorization") token: String, @Path("id") id: Int, @Body request: PaqueteRequestDto): Response<PaqueteDto>
 }
