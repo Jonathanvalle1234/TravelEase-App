@@ -27,7 +27,7 @@ fun ClienteScreen(
     onNavigateToSugerencias: () -> Unit,
     onNavigateToEncuesta: () -> Unit
 ) {
-    // Obtenemos el contexto de la pantalla
+
     val context = androidx.compose.ui.platform.LocalContext.current
 
     //  1. ABRIMOS LA BÓVEDA Y SACAMOS EL NOMBRE REAL DEL USUARIO
@@ -49,7 +49,7 @@ fun ClienteScreen(
                 .padding(vertical = 40.dp), // Un poco más de espacio arriba
             contentAlignment = Alignment.Center
         ) {
-            //  2. REEMPLAZAMOS EL TEXTO QUEMADO POR LA VARIABLE DINÁMICA
+
             Text(
                 text = "Hola, $nombreReal",
                 fontSize = 26.sp,
@@ -95,7 +95,7 @@ fun ClienteScreen(
         ) {
             Button(
                 onClick = {
-                    // Borramos la sesión física y en memoria
+
                     viewModel.cerrarSesion(context)
                     onNavigateBack()         // Regresamos al Login
                 },

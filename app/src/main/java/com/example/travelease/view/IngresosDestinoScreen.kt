@@ -45,7 +45,7 @@ fun IngresosDestinoScreen(onNavigateBack: () -> Unit) {
 
         Spacer(modifier = Modifier.weight(1f))
 
-        // BARRA INFERIOR (Solo flecha de atrás)
+
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
             IconButton(onClick = onNavigateBack) {
                 Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = "Atrás", tint = Color.Gray, modifier = Modifier.size(32.dp))

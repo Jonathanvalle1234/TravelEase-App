@@ -46,7 +46,7 @@ fun VueloFormScreen(
     var fechaSalida by remember { mutableStateOf("") }
     var fechaEntrada by remember { mutableStateOf("") }
 
-    // 🚀 CARGAR DATOS AUTOMÁTICAMENTE AL EDITAR
+    // CARGAR DATOS AUTOMÁTICAMENTE AL EDITAR
     LaunchedEffect(key1 = vueloId) {
         if (modo == "editar" && vueloId > 0) {
             viewModel.obtenerVueloPorId(vueloId) { vuelo ->
@@ -60,12 +60,12 @@ fun VueloFormScreen(
         }
     }
 
-    // 🚀 Función directa para enviar los datos al ViewModel
+    //  Función directa para enviar los datos al ViewModel
     val ejecutarGuardado = {
         if (aerolinea.isBlank() || precio.isBlank() || origen.isBlank() || destino.isBlank()) {
             Toast.makeText(context, "Por favor, llene los campos principales", Toast.LENGTH_SHORT).show()
         } else {
-            println("🚀 ENVIANDO A DJANGO -> Aerolínea: '$aerolinea', Precio: '$precio', Origen: '$origen', Salida: '$fechaSalida'")
+            println(" ENVIANDO A DJANGO -> Aerolínea: '$aerolinea', Precio: '$precio', Origen: '$origen', Salida: '$fechaSalida'")
 
             viewModel.guardarVuelo(
                 modo = modo,
@@ -82,13 +82,13 @@ fun VueloFormScreen(
                 },
                 onError = { errorMensaje ->
                     Toast.makeText(context, "Django dice: $errorMensaje", Toast.LENGTH_LONG).show()
-                    println("🚨 Error de Django al guardar: $errorMensaje")
+                    println(" Error de Django al guardar: $errorMensaje")
                 }
             )
         }
     }
 
-    // 🚀 Configuración del Scroll State
+    //  Configuración del Scroll State
     val scrollState = rememberScrollState()
 
     Column(
@@ -340,7 +340,6 @@ fun VueloTextField(
     )
 }
 
-//  Modificamos el botón para aceptar anchos dinámicos (modifier)
 @Composable
 fun FormOutlinedButton(
     text: String,

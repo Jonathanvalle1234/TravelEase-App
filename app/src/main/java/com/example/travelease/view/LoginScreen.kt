@@ -6,6 +6,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -14,6 +17,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -29,9 +34,9 @@ fun LoginScreen(
 ) {
     var usuario by remember { mutableStateOf("") }
     var contrasena by remember { mutableStateOf("") }
+    var mostrarPassword by remember { mutableStateOf(false) }
     val mensajeRespuesta = viewModel.loginMessage.value
 
-    // Obtenemos el contexto de Android para que el ViewModel guarde el token
     val context = LocalContext.current
 
     Column(
@@ -69,7 +74,8 @@ fun LoginScreen(
             onValueChange = { usuario = it },
             label = { Text("Usuario") },
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp)
+            shape = RoundedCornerShape(12.dp),
+            singleLine = true
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -79,7 +85,21 @@ fun LoginScreen(
             onValueChange = { contrasena = it },
             label = { Text("Contraseña") },
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp)
+            shape = RoundedCornerShape(12.dp),
+            singleLine = true,
+            visualTransformation = if (mostrarPassword) VisualTransformation.None
+            else PasswordVisualTransformation(),
+            trailingIcon = {
+                IconButton(onClick = { mostrarPassword = !mostrarPassword }) {
+                    Icon(
+                        imageVector = if (mostrarPassword) Icons.Default.Visibility
+                        else Icons.Default.VisibilityOff,
+                        contentDescription = if (mostrarPassword) "Ocultar contraseña"
+                        else "Mostrar contraseña",
+                        tint = Color.Gray
+                    )
+                }
+            }
         )
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -90,21 +110,14 @@ fun LoginScreen(
                     context = context,
                     correo = usuario,
                     clave = contrasena,
-                    // AHORA RECIBE EL ROL DIRECTAMENTE DEL VIEWMODEL
                     onSuccess = { rolRecibido ->
-
-                        // PASO 1: Limpiamos las cajas de texto dejándolas vacías
                         usuario = ""
                         contrasena = ""
-
-                        // PASO 2: Limpiamos el mensaje rojo de éxito/error del ViewModel
                         viewModel.limpiarMensaje()
-
-                        // 🚀 PASO 3: Navegamos asegurando todas las variantes de Gerencia
                         when (rolRecibido.lowercase()) {
                             "admin", "gerencia", "gerente" -> onNavigateToGerencia()
                             "asistente" -> onNavigateToAsistente()
-                            else -> onNavigateToCliente() // Por defecto si es cliente
+                            else -> onNavigateToCliente()
                         }
                     }
                 )
@@ -115,10 +128,19 @@ fun LoginScreen(
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2196F3)),
             shape = RoundedCornerShape(12.dp)
         ) {
-            Text(text = "Iniciar sesión", fontSize = 16.sp, color = Color.White, fontWeight = FontWeight.Bold)
+            Text(
+                text = "Iniciar sesión",
+                fontSize = 16.sp,
+                color = Color.White,
+                fontWeight = FontWeight.Bold
+            )
         }
 
-        Text(text = mensajeRespuesta, color = Color.Red, modifier = Modifier.padding(top = 16.dp))
+        Text(
+            text = mensajeRespuesta,
+            color = Color.Red,
+            modifier = Modifier.padding(top = 16.dp)
+        )
 
         Spacer(modifier = Modifier.height(40.dp))
     }

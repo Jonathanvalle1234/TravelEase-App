@@ -101,7 +101,7 @@ fun MenuAsistenteScreen(
             Spacer(modifier = Modifier.height(16.dp))
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
 
-                // Tarjeta de Paquetes conectada a la cantidad real de la API
+
                 DashboardCard(
                     titulo = "Paquetes",
                     cantidad = listaPaquetes.size.toString(), // <--- Cantidad real dinámica
@@ -111,7 +111,7 @@ fun MenuAsistenteScreen(
                     onNavigateToPaquetes()
                 }
 
-                // Tarjeta de Reservas conectada a la cantidad real obtenida del servidor
+
                 DashboardCard(
                     titulo = "Reservas",
                     cantidad = listaReservas.size.toString(),

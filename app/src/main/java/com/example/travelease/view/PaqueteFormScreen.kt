@@ -63,7 +63,7 @@ fun PaqueteFormScreen(
             .background(Color(0xFFF4F6F9))
             .verticalScroll(rememberScrollState())
     ) {
-        // --- Header Azul Dinámico ---
+
         Surface(
             color = Color(0xFF2196F3),
             shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp),
@@ -185,7 +185,7 @@ fun PaqueteFormScreen(
             Text("AGREGAR SERVICIOS", fontWeight = FontWeight.ExtraBold, fontSize = 12.sp, color = Color.Black)
             Spacer(modifier = Modifier.height(8.dp))
 
-            // --- Menús Desplegables con Datos Reales de la BD ---
+
             DropdownReal(
                 label = "Vuelos Disponibles",
                 opciones = if (vuelosDisponibles.isNotEmpty()) vuelosDisponibles.map { it.nombre } else listOf("No hay vuelos registrados"),
@@ -210,7 +210,7 @@ fun PaqueteFormScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // --- Total Calculado (Inicia en 0.00 si es nuevo) ---
+
             val totalMostrado = if (esEdicion) {
                 String.format("%.2f", paqueteAEditar?.precioCalculado ?: 0.0)
             } else {
@@ -275,7 +275,7 @@ fun PaqueteFormScreen(
     }
 }
 
-// --- Componente Desplegable Real ---
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DropdownReal(

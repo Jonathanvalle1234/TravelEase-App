@@ -7,7 +7,7 @@ import kotlinx.coroutines.withContext
 
 class GerenciaRepository {
 
-    // AURELIO: Este método llama a la API. Coroutine en hilo IO para no trabar la pantalla.
+
     suspend fun obtenerTopClientes(): List<ClienteDto> {
         return withContext(Dispatchers.IO) {
             try {

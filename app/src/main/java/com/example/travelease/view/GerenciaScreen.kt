@@ -50,9 +50,7 @@ fun GerenciaScreen(
             Text(text = "Reportes", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Color.Black)
             Spacer(modifier = Modifier.height(16.dp))
 
-            // --- TARJETAS CON LAS IMÁGENES REALES ---
-            // IMPORTANTE: Asegúrate de que los nombres R.drawable.icono_xxx coincidan
-            // con los nombres de los archivos que pegaste en la carpeta drawable.
+
             MenuGerenciaCard(
                 idImagen = R.drawable.icono_ingresos, // El nombre de tu archivo PNG
                 texto = "Ingresos\npor Destino",
@@ -106,7 +104,7 @@ fun MenuGerenciaCard(idImagen: Int, texto: String, onClick: () -> Unit) {
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // --- AQUÍ DIBUJAMOS LA IMAGEN DE FIGMA ---
+
         Image(
             painter = painterResource(id = idImagen),
             contentDescription = "Ícono de $texto",

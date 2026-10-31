@@ -28,10 +28,10 @@ fun ClientesListScreen(
     onNavigateToEditar: (Int) -> Unit, // 🚀 CAMBIO 1: Ahora recibe el ID del cliente (Int)
     onNavigateBack: () -> Unit
 ) {
-    // Escuchamos la lista de clientes reales desde el ViewModel
+
     val clientes by viewModel.listaClientes.collectAsState()
 
-    // Descargamos los datos automáticamente al entrar a esta pantalla
+
     LaunchedEffect(Unit) {
         viewModel.cargarClientes()
     }
@@ -110,7 +110,7 @@ fun ClienteCard(cliente: ClienteDto, onEditarClick: () -> Unit) {
             verticalAlignment = Alignment.Bottom, // Lápiz alineado abajo
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            // DATOS EN EL ORDEN EXACTO DE FIGMA USANDO ClienteDto
+
             Column(modifier = Modifier.weight(1f)) {
                 // 1. Nombres
                 Text(text = "👤 ${cliente.name}", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color.Black)

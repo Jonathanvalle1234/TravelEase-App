@@ -54,7 +54,6 @@ fun EditarReservaScreen(
     var estado by remember { mutableStateOf<OpcionItem?>(null) }
     var tipoPago by remember { mutableStateOf<OpcionItem?>(null) }
 
-    // Precarga los valores actuales cuando llegan las listas
     LaunchedEffect(clientes) {
         if (cliente == null) cliente = clientes.firstOrNull { it.id == clienteInicialId }
     }
@@ -147,7 +146,7 @@ fun EditarReservaScreen(
 
             Spacer(Modifier.height(18.dp))
 
-            // Estado: solo editable si la reserva está en Pendiente
+
             Box(Modifier.alpha(if (estadoBloqueado) 0.5f else 1f)) {
                 CampoDropdown(
                     etiqueta = "📌 ESTADO DE LA RESERVA",
@@ -190,7 +189,7 @@ fun EditarReservaScreen(
                         cliente = null
                         paquete = null
                         tipoPago = null
-                        // El estado bloqueado no se limpia
+
                         if (!estadoBloqueado) estado = null
                         onLimpiar()
                     }

@@ -1,4 +1,3 @@
-
 package com.example.travelease.viewmodel
 
 import android.util.Log
@@ -26,6 +25,16 @@ class ReservaPanelViewModel : ViewModel() {
 
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
+
+    // Paginación
+    private val _paginaActual = MutableStateFlow(1)
+    val paginaActual: StateFlow<Int> = _paginaActual.asStateFlow()
+
+    private val _totalPaginas = MutableStateFlow(1)
+    val totalPaginas: StateFlow<Int> = _totalPaginas.asStateFlow()
+
+    private val _hayMasPaginas = MutableStateFlow(false)
+    val hayMasPaginas: StateFlow<Boolean> = _hayMasPaginas.asStateFlow()
 
     private val _clientes = MutableStateFlow<List<OpcionItem>>(emptyList())
     val clientes: StateFlow<List<OpcionItem>> = _clientes.asStateFlow()
@@ -74,7 +83,8 @@ class ReservaPanelViewModel : ViewModel() {
                 } else errores.add("Tipos de pago ${rt.code()}")
 
                 _errorMessage.value =
-                    if (errores.isEmpty()) null else "Error al cargar: ${errores.joinToString(", ")}"
+                    if (errores.isEmpty()) null
+                    else "Error al cargar: ${errores.joinToString(", ")}"
             } catch (e: Exception) {
                 _errorMessage.value = "Error al cargar catálogos: ${e.localizedMessage}"
             } finally {
@@ -83,19 +93,27 @@ class ReservaPanelViewModel : ViewModel() {
         }
     }
 
-    // Obtener todas las reservas del panel (con 1 reintento)
-    fun cargarReservas(token: String) {
+
+    fun cargarReservas(token: String, pagina: Int = 1, resetear: Boolean = true) {
+        if (_isLoading.value) return
         viewModelScope.launch {
             _isLoading.value = true
             var error: String? = null
             for (intento in 1..2) {
                 try {
-                    val response = repository.obtenerReservas(token)
+                    val response = repository.obtenerReservas(token, pagina)
                     if (response.isSuccessful) {
-                        _reservas.value = response.body() ?: emptyList()
+                        val body = response.body()
+                        val nuevas = body?.data ?: emptyList()
+                        _reservas.value = if (resetear) nuevas
+                        else _reservas.value + nuevas
+                        val pag = body?.pagination
+                        _paginaActual.value = pag?.currentPage ?: 1
+                        _totalPaginas.value = pag?.totalPages ?: 1
+                        _hayMasPaginas.value = pag?.hasNextPage ?: false
                         error = null
                     } else {
-                        error = "Error al cargar: ${response.errorBody()?.string()}"
+                        error = "Error ${response.code()}: ${response.errorBody()?.string()}"
                     }
                     break
                 } catch (e: Exception) {
@@ -107,7 +125,14 @@ class ReservaPanelViewModel : ViewModel() {
         }
     }
 
-    // Crear una nueva reserva
+    /** Carga la siguiente página y la agrega al final de la lista. */
+    fun cargarMasReservas(token: String) {
+        if (_hayMasPaginas.value && !_isLoading.value) {
+            cargarReservas(token, _paginaActual.value + 1, resetear = false)
+        }
+    }
+
+    /** Crear una nueva reserva */
     fun crearReserva(token: String, request: ReservaRequest, onComplete: (Boolean) -> Unit) {
         viewModelScope.launch {
             _isLoading.value = true
@@ -134,12 +159,7 @@ class ReservaPanelViewModel : ViewModel() {
         }
     }
 
-    /**
-     * Edita una reserva en dos pasos:
-     * 1) PUT con cliente, paquete, pago y vendedor.
-     * 2) PUT update_status, solo si estadoNuevoId no es null (el estado cambió).
-     * onComplete(exito, mensajeError)
-     */
+
     fun editarReserva(
         token: String,
         id: Int,
@@ -192,7 +212,7 @@ class ReservaPanelViewModel : ViewModel() {
         }
     }
 
-    // Eliminar una reserva
+    /** Eliminar una reserva */
     fun eliminarReserva(token: String, id: Int, onComplete: (Boolean) -> Unit) {
         viewModelScope.launch {
             _isLoading.value = true

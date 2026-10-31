@@ -26,7 +26,7 @@ fun EncuestaScreen(viewModel: ClienteViewModel, onNavigateBack: () -> Unit) {
     var relacionCalidadPrecio by remember { mutableStateOf(0) }
     var calidadServicioProporcionado by remember { mutableStateOf(0) }
 
-    // Preguntas de Sí / No (1 para Sí, 0 para No)
+
     var informacionProporcionadaSencilla by remember { mutableStateOf<Int?>(null) }
     var recomendarAOtros by remember { mutableStateOf<Int?>(null) }
     var volverContratar by remember { mutableStateOf<Int?>(null) }
@@ -47,7 +47,7 @@ fun EncuestaScreen(viewModel: ClienteViewModel, onNavigateBack: () -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        // Título limpio y centrado
+
         Text(
             text = "Encuesta de Satisfacción",
             fontSize = 22.sp,
@@ -187,7 +187,7 @@ fun EncuestaScreen(viewModel: ClienteViewModel, onNavigateBack: () -> Unit) {
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // 👉 LA FLECHA MINIMALISTA (Abajo, separada y a la izquierda)
+
         Box(
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.CenterStart // La empuja totalmente a la izquierda
@@ -205,7 +205,7 @@ fun EncuestaScreen(viewModel: ClienteViewModel, onNavigateBack: () -> Unit) {
             }
         }
 
-        // --- ESPACIO EXTRA DE RESPIRO ---
+
         Spacer(modifier = Modifier.height(250.dp))
     }
 }

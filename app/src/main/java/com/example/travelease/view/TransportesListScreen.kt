@@ -36,7 +36,7 @@ fun TransportesListScreen(
     val isLoading by viewModel.isLoading.collectAsState()
     val context = LocalContext.current
 
-    // Cargar los transportes desde Django al abrir la pantalla
+
     LaunchedEffect(Unit) {
         viewModel.cargarTransportes()
     }
@@ -77,7 +77,7 @@ fun TransportesListScreen(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Lista de Transportes o Indicador de Carga
+
         if (isLoading) {
             Box(modifier = Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator(color = Color(0xFF2196F3))

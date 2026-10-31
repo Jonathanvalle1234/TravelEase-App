@@ -12,6 +12,7 @@ import com.example.travelease.model.LoginResponse
 import com.example.travelease.model.PaqueteDto
 import com.example.travelease.model.PaqueteRequestDto
 import com.example.travelease.model.PrecioRequest
+import com.example.travelease.model.RespuestaPaginadaDto
 import com.example.travelease.model.Reserva
 import com.example.travelease.model.ReservaAdminDto
 import com.example.travelease.model.ReservaRequest
@@ -33,18 +34,17 @@ import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface TravelEaseApi {
+
+
+    // CLIENTE MÓVIL
 
     @GET("api/clients-mobile/reservas/")
     suspend fun getReservas(
         @Header("Authorization") token: String
     ): Response<List<Reserva>>
-
-    @GET("api/clients/")
-    suspend fun getClientes(
-        @Header("Authorization") token: String
-    ): Response<List<ClienteDto>>
 
     @POST("api/users/login/")
     suspend fun login(
@@ -69,6 +69,14 @@ interface TravelEaseApi {
         @Body valoracion: ValoracionDto
     ): Response<Unit>
 
+
+    // CLIENTES
+
+    @GET("api/clients/")
+    suspend fun getClientes(
+        @Header("Authorization") token: String
+    ): Response<List<ClienteDto>>
+
     @POST("api/clients/")
     suspend fun crearCliente(
         @Header("Authorization") token: String,
@@ -81,6 +89,9 @@ interface TravelEaseApi {
         @Path("id") id: Int,
         @Body cliente: ClienteActualizarRequestDto
     ): Response<ClienteDto>
+
+
+    // VUELOS
 
     @GET("api/services/flights/")
     suspend fun obtenerVuelos(
@@ -100,13 +111,6 @@ interface TravelEaseApi {
         @Body vuelo: VueloRequestDto
     ): Response<Vuelo>
 
-    @POST("api/services/flights/{id}/prices/")
-    suspend fun actualizarPrecioVuelo(
-        @Header("Authorization") token: String,
-        @Path("id") id: Int,
-        @Body priceMap: Map<String, Double>
-    ): Response<Void>
-
     @PUT("api/services/flights/{id}/")
     suspend fun actualizarVueloParcial(
         @Header("Authorization") token: String,
@@ -114,11 +118,21 @@ interface TravelEaseApi {
         @Body vuelo: VueloUpdateDto
     ): Response<Vuelo>
 
+    @POST("api/services/flights/{id}/prices/")
+    suspend fun actualizarPrecioVuelo(
+        @Header("Authorization") token: String,
+        @Path("id") id: Int,
+        @Body priceMap: Map<String, Double>
+    ): Response<Void>
+
     @DELETE("api/services/flights/{id}/")
     suspend fun eliminarVuelo(
         @Header("Authorization") token: String,
         @Path("id") id: Int
     ): Response<Void>
+
+
+    // TRANSPORTES
 
     @GET("api/catalogos/type-transports/")
     suspend fun obtenerTiposTransporte(
@@ -156,12 +170,19 @@ interface TravelEaseApi {
         @Path("id") id: Int
     ): Response<Void>
 
-    // --- RUTAS DE HOTELES ---
+
+    // HOTELES
+
     @GET("api/services/hotels/")
-    suspend fun obtenerHoteles(@Header("Authorization") token: String): Response<List<Hotel>>
+    suspend fun obtenerHoteles(
+        @Header("Authorization") token: String
+    ): Response<List<Hotel>>
 
     @POST("api/services/hotels/")
-    suspend fun crearHotel(@Header("Authorization") token: String, @Body hotel: HotelRequest): Response<Hotel>
+    suspend fun crearHotel(
+        @Header("Authorization") token: String,
+        @Body hotel: HotelRequest
+    ): Response<Hotel>
 
     @PATCH("api/services/hotels/{id}/")
     suspend fun actualizarHotel(
@@ -171,7 +192,10 @@ interface TravelEaseApi {
     ): Response<Hotel>
 
     @DELETE("api/services/hotels/{id}/")
-    suspend fun eliminarHotel(@Header("Authorization") token: String, @Path("id") id: Int): Response<Unit>
+    suspend fun eliminarHotel(
+        @Header("Authorization") token: String,
+        @Path("id") id: Int
+    ): Response<Unit>
 
     @POST("api/services/hotels/{id}/prices/")
     suspend fun actualizarPrecioHotel(
@@ -180,14 +204,43 @@ interface TravelEaseApi {
         @Body precio: PrecioRequest
     ): Response<Unit>
 
-    // ====================================================================
-    // RUTAS DEL PANEL ADMINISTRATIVO DE RESERVAS
-    // ====================================================================
+
+    // PAQUETES
+
+    // Para los desplegables de Crear/Editar Reserva (lista simple)
+    @GET("api/packages/")
+    suspend fun getPaquetesOpciones(
+        @Header("Authorization") token: String
+    ): Response<List<CatalogoItemDto>>
+
+    // Para la pantalla de Paquetes del asistente (con paginación)
+    @GET("api/packages/")
+    suspend fun obtenerPaquetes(
+        @Header("Authorization") token: String,
+        @Query("page") page: Int = 1
+    ): Response<RespuestaPaginadaDto<PaqueteDto>>
+
+    @POST("api/packages/")
+    suspend fun crearPaquete(
+        @Header("Authorization") token: String,
+        @Body request: PaqueteRequestDto
+    ): Response<PaqueteDto>
+
+    @PUT("api/packages/{id}/")
+    suspend fun actualizarPaquete(
+        @Header("Authorization") token: String,
+        @Path("id") id: Int,
+        @Body request: PaqueteRequestDto
+    ): Response<PaqueteDto>
+
+
+    // RESERVAS (PANEL ADMINISTRATIVO)
 
     @GET("api/reservations/reservations/")
     suspend fun obtenerReservasPanel(
-        @Header("Authorization") token: String
-    ): Response<List<ReservaAdminDto>>
+        @Header("Authorization") token: String,
+        @Query("page") page: Int = 1
+    ): Response<RespuestaPaginadaDto<ReservaAdminDto>>
 
     @GET("api/reservations/reservations/{id}/")
     suspend fun obtenerReservaPanelPorId(
@@ -201,7 +254,6 @@ interface TravelEaseApi {
         @Body reserva: ReservaRequest
     ): Response<ReservaAdminDto>
 
-    // PUT con client, package_id, payment_type, seller_user
     @PUT("api/reservations/reservations/{id}/")
     suspend fun actualizarReservaPanel(
         @Header("Authorization") token: String,
@@ -209,7 +261,6 @@ interface TravelEaseApi {
         @Body reserva: java.util.HashMap<String, Any>
     ): Response<ReservaAdminDto>
 
-    // Cambiado a PUT exactamente como lo requiere Django en update_status
     @PUT("api/reservations/reservations/{id}/update_status/")
     suspend fun actualizarEstadoReservaPanel(
         @Header("Authorization") token: String,
@@ -223,14 +274,7 @@ interface TravelEaseApi {
         @Path("id") id: Int
     ): Response<Void>
 
-    // ====================================================================
-    // CATÁLOGOS PARA LAS PANTALLAS CREAR / EDITAR RESERVA
-    // ====================================================================
-
-    @GET("api/packages/")
-    suspend fun getPaquetesOpciones(
-        @Header("Authorization") token: String
-    ): Response<List<CatalogoItemDto>>
+    // CATÁLOGOS
 
     @GET("api/reservations/reservation-statuses/")
     suspend fun getEstadosReservaOpciones(
@@ -241,13 +285,4 @@ interface TravelEaseApi {
     suspend fun getTiposPagoOpciones(
         @Header("Authorization") token: String
     ): Response<List<CatalogoItemDto>>
-    @GET("api/packages/")
-    suspend fun obtenerPaquetes(
-        @Header("Authorization") token: String
-    ): Response<List<PaqueteDto>> // <-- Volvemos a List<PaqueteDto>
-    @POST("api/paquetes/") // O la ruta que use tu backend
-    suspend fun crearPaquete(@Header("Authorization") token: String, @Body request: PaqueteRequestDto): Response<PaqueteDto>
-
-    @PUT("api/paquetes/{id}/")
-    suspend fun actualizarPaquete(@Header("Authorization") token: String, @Path("id") id: Int, @Body request: PaqueteRequestDto): Response<PaqueteDto>
 }

@@ -2,7 +2,6 @@ package com.example.travelease.model
 
 import com.google.gson.annotations.SerializedName
 
-// Lo que recibimos de Django (GET)
 data class Hotel(
     val id: Int,
     @SerializedName("name") val nombre: String,
@@ -12,7 +11,6 @@ data class Hotel(
     @SerializedName("active") val activo: Boolean = true
 )
 
-// Lo que enviamos a Django para Crear/Editar (POST/PATCH)
 data class HotelRequest(
     @SerializedName("name") val nombre: String,
     @SerializedName("city") val ciudad: String,

@@ -116,7 +116,7 @@ class VueloViewModel : ViewModel() {
         }
     }
 
-    // 🚀 FUNCIÓN PARA ELIMINAR UN VUELO DESDE EL VIEWMODEL
+    //  FUNCIÓN PARA ELIMINAR UN VUELO DESDE EL VIEWMODEL
     fun eliminarVuelo(
         vueloId: Int,
         onSuccess: () -> Unit,
@@ -125,17 +125,17 @@ class VueloViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val tokenActual = ClienteViewModel.authToken
-                println("=== 🚀 ELIMINANDO VUELO $vueloId EN DJANGO ===")
+                println("===  ELIMINANDO VUELO $vueloId EN DJANGO ===")
 
                 val response = RetrofitClient.apiService.eliminarVuelo(tokenActual, vueloId)
 
                 if (response.isSuccessful) {
-                    println("✅ ¡Éxito! Vuelo eliminado correctamente de Django.")
+                    println(" ¡Éxito! Vuelo eliminado correctamente de Django.")
                     cargarVuelos() // Refrescamos la lista de vuelos automáticamente
                     onSuccess()
                 } else {
                     val errorBody = response.errorBody()?.string() ?: "Sin detalles"
-                    println("🚨 Error al eliminar vuelo: $errorBody")
+                    println(" Error al eliminar vuelo: $errorBody")
                     onError(errorBody)
                 }
             } catch (e: Exception) {

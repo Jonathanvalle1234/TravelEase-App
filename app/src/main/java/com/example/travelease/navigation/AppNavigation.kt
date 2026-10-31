@@ -223,7 +223,7 @@ fun AppNavigation() {
             )
         }
 
-        // --- 🌴 PAQUETES TURÍSTICOS (Lista) ---
+        // ---  PAQUETES TURÍSTICOS (Lista) ---
         composable(RutasAsistente.ListaPaquetes.ruta) {
             PaquetesListScreen(
                 token = ClienteViewModel.authToken,
@@ -241,7 +241,7 @@ fun AppNavigation() {
             )
         }
 
-        // --- 🌴 PAQUETES TURÍSTICOS (Formulario Único: Crear / Editar con Servicios Reales) ---
+        // ---  PAQUETES TURÍSTICOS (Formulario Único: Crear / Editar con Servicios Reales) ---
         composable(
             route = RutasAsistente.FormularioPaquete.ruta,
             arguments = listOf(
@@ -306,11 +306,11 @@ fun AppNavigation() {
                         transporteId = transporteId,
                         token = ClienteViewModel.authToken,
                         onSuccess = {
-                            Toast.makeText(context, "✅ Paquete guardado con éxito", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, "Paquete guardado con éxito", Toast.LENGTH_SHORT).show()
                             navController.popBackStack()
                         },
                         onError = { errorMsg ->
-                            Toast.makeText(context, "❌ Error: $errorMsg", Toast.LENGTH_LONG).show()
+                            Toast.makeText(context, " Error: $errorMsg", Toast.LENGTH_LONG).show()
                         }
                     )
                 },
@@ -318,7 +318,7 @@ fun AppNavigation() {
             )
         }
 
-        // --- 📋 PANEL DE RESERVAS ---
+        // ---  PANEL DE RESERVAS ---
         composable(RutasAsistente.PanelReservas.ruta) {
             ReservaPanelScreen(
                 viewModel = reservaPanelViewModel,
@@ -331,7 +331,7 @@ fun AppNavigation() {
             )
         }
 
-        // --- ➕ CREAR RESERVA ---
+        // ---  CREAR RESERVA ---
         composable(RutasAsistente.CrearReserva.ruta) {
             val context = LocalContext.current
             val token = ClienteViewModel.authToken
@@ -358,11 +358,11 @@ fun AppNavigation() {
                         )
                     ) { exito ->
                         if (exito) {
-                            Toast.makeText(context, "✅ Reserva agregada con éxito", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, " Reserva agregada con éxito", Toast.LENGTH_SHORT).show()
                             navController.popBackStack()
                         } else {
                             val detalle = reservaPanelViewModel.errorMessage.value ?: "Error desconocido"
-                            Toast.makeText(context, "❌ $detalle", Toast.LENGTH_LONG).show()
+                            Toast.makeText(context, " $detalle", Toast.LENGTH_LONG).show()
                         }
                     }
                 },
@@ -370,7 +370,7 @@ fun AppNavigation() {
             )
         }
 
-        // --- ✏️ EDITAR RESERVA ---
+        // ---  EDITAR RESERVA ---
         composable(
             route = RutasAsistente.EditarReserva.ruta,
             arguments = listOf(navArgument("id") { type = NavType.IntType })
@@ -428,10 +428,10 @@ fun AppNavigation() {
                             estadoNuevoId = if (estadoCambio) estadoId else null
                         ) { exito, mensaje ->
                             if (exito) {
-                                Toast.makeText(context, "✅ Reserva actualizada con éxito", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, " Reserva actualizada con éxito", Toast.LENGTH_SHORT).show()
                                 navController.popBackStack()
                             } else {
-                                Toast.makeText(context, "❌ ${mensaje ?: "Error desconocido"}", Toast.LENGTH_LONG).show()
+                                Toast.makeText(context, " ${mensaje ?: "Error desconocido"}", Toast.LENGTH_LONG).show()
                             }
                         }
                     },
@@ -451,7 +451,7 @@ fun AppNavigation() {
             )
         }
 
-        // --- ✈️ VUELOS ---
+        // ---  VUELOS ---
         composable(RutasAsistente.ListaVuelos.ruta) {
             VuelosListScreen(
                 onNavigateBack = { navController.popBackStack() },
@@ -477,7 +477,7 @@ fun AppNavigation() {
             VueloFormScreen(modo = modo, vueloId = id, onNavigateBack = { navController.popBackStack() })
         }
 
-        // --- 🚌 TRANSPORTES ---
+        // ---  TRANSPORTES ---
         composable(RutasAsistente.ListaTransportes.ruta) {
             TransportesListScreen(
                 viewModel = transporteViewModel,
@@ -509,7 +509,7 @@ fun AppNavigation() {
             )
         }
 
-        // --- 🏨 HOTELES ---
+        // ---  HOTELES ---
         composable(RutasAsistente.ListaHoteles.ruta) {
             HotelesListScreen(
                 viewModel = hotelViewModel,
@@ -541,7 +541,7 @@ fun AppNavigation() {
             )
         }
 
-        // --- 👤 CLIENTES ---
+        // ---  CLIENTES ---
         composable(RutasAsistente.ListaClientes.ruta) {
             ClientesListScreen(
                 onNavigateToNuevo = {

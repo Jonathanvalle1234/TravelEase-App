@@ -64,7 +64,7 @@ fun VuelosListScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // 🚀 BOTÓN "AGREGAR" MOVIDO ARRIBA (Alineado a la derecha)
+
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.End
@@ -172,7 +172,7 @@ fun VueloCardItem(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // ✏️ Botón de Editar (Lápiz) -> Lado Izquierdo
+
                 IconButton(
                     onClick = onEditar,
                     modifier = Modifier

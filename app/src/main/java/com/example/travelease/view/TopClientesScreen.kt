@@ -36,7 +36,7 @@ fun TopClientesScreen(onNavigateBack: () -> Unit) {
 
         Spacer(modifier = Modifier.height(48.dp)) // Espacio fijo moderado para separar el gráfico del botón
 
-        // Gráfico de barras de Figma (Ahora está más arriba, en su lugar correcto)
+
         Row(
             modifier = Modifier.fillMaxWidth().height(250.dp).padding(horizontal = 16.dp),
             horizontalArrangement = Arrangement.SpaceEvenly,
@@ -50,7 +50,7 @@ fun TopClientesScreen(onNavigateBack: () -> Unit) {
 
         Spacer(modifier = Modifier.weight(1f)) // <--- EL RESORTE GIGANTE: Ahora solo empuja la flecha hacia abajo
 
-        // BARRA INFERIOR (Solo flecha de atrás)
+
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
             IconButton(onClick = onNavigateBack) {
                 Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = "Atrás", tint = Color.Gray, modifier = Modifier.size(32.dp))

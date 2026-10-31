@@ -22,7 +22,7 @@ class TransporteViewModel : ViewModel() {
     val isLoading: StateFlow<Boolean> = _isLoading
 
     init {
-        // Al iniciar, cargamos el catálogo para que el Dropdown funcione de inmediato
+
         cargarTiposTransporte()
     }
 
@@ -34,15 +34,15 @@ class TransporteViewModel : ViewModel() {
                 if (response.isSuccessful) {
                     val lista = response.body() ?: emptyList()
                     _tiposTransporte.value = lista
-                    // 🚀 RASTREADOR DE ÉXITO
-                    println("✅ CARGA EXITOSA: Se descargaron ${lista.size} tipos de transporte desde Django.")
+                    //  RASTREADOR DE ÉXITO
+                    println(" CARGA EXITOSA: Se descargaron ${lista.size} tipos de transporte desde Django.")
                 } else {
-                    // 🚀 RASTREADOR DE ERROR HTTP (Ej: 404, 401)
-                    println("❌ ERROR DEL SERVIDOR (Tipos Transporte): Código ${response.code()} - ${response.errorBody()?.string()}")
+                    //  RASTREADOR DE ERROR HTTP (Ej: 404, 401)
+                    println(" ERROR DEL SERVIDOR (Tipos Transporte): Código ${response.code()} - ${response.errorBody()?.string()}")
                 }
             } catch (e: Exception) {
-                // 🚀 RASTREADOR DE CRASHEO (Ej: No hay internet o error leyendo el JSON)
-                println("❌ ERROR FATAL DE CONEXIÓN (Tipos Transporte): ${e.message}")
+
+                println(" ERROR FATAL DE CONEXIÓN (Tipos Transporte): ${e.message}")
                 e.printStackTrace()
             }
         }
@@ -55,7 +55,7 @@ class TransporteViewModel : ViewModel() {
                 val token = ClienteViewModel.authToken
                 val response = RetrofitClient.apiService.obtenerTransportes(token)
                 if (response.isSuccessful) {
-                    // Filtramos solo los activos, tal como lo hace el backend
+
                     _transportes.value = response.body()?.filter { it.active } ?: emptyList()
                 }
             } catch (e: Exception) { e.printStackTrace() }

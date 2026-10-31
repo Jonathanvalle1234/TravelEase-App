@@ -36,7 +36,7 @@ data class VueloPrueba(
     val precio: String
 )
 
-// 2. Contenedor principal con el botón en su propio espacio inferior
+
 @Composable
 fun PantallaServiciosVuelos(onBackPressed: () -> Unit = {}) {
     Column(
@@ -45,8 +45,6 @@ fun PantallaServiciosVuelos(onBackPressed: () -> Unit = {}) {
             .background(BackgroundLight)
     ) {
 
-        // BLOQUE 1: Todo el contenido que se puede deslizar (Formulario + Lista)
-        // El Modifier.weight(1f) hace que ocupe todo el espacio sobrante antes del botón
         Column(
             modifier = Modifier
                 .weight(1f)
@@ -67,7 +65,7 @@ fun PantallaServiciosVuelos(onBackPressed: () -> Unit = {}) {
             ListadoVuelos()
         }
 
-        // BLOQUE 2: El espacio exclusivo para el botón de retroceso (No tapa nada)
+
         Box(
             modifier = Modifier
                 .fillMaxWidth()

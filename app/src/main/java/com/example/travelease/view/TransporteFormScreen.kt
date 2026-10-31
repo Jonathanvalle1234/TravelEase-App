@@ -41,7 +41,7 @@ fun TransporteFormScreen(
 
     var expanded by remember { mutableStateOf(false) }
 
-    // Carga de datos si el formulario está en modo edición y descarga el catálogo
+
     LaunchedEffect(transporteId) {
         viewModel.cargarTiposTransporte()
 
@@ -60,14 +60,14 @@ fun TransporteFormScreen(
     val tituloPantalla = if (modo == "editar") "EDITAR TRANSPORTE" else "DATOS DEL TRANSPORTE"
     val textoBotonPrimario = if (modo == "editar") "Actualizar" else "Agregar"
 
-    // 🚀 NUEVO: Variable para controlar el desplazamiento (scroll)
+
     val scrollState = rememberScrollState()
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFEDF1F5))
-            // 🚀 NUEVO: Configuraciones para el Scroll y el Teclado
+
             .verticalScroll(scrollState)
             .imePadding() // Empuja la pantalla hacia arriba cuando el teclado aparece
             .padding(16.dp),
@@ -244,7 +244,7 @@ fun TransporteFormScreen(
             }
         }
 
-        // 🚀 NUEVO: Reemplazamos el weight(1f) por un espacio fijo de 32.dp
+
         Spacer(modifier = Modifier.height(32.dp))
 
         // Botón de retroceso inferior

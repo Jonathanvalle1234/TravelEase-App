@@ -1,6 +1,6 @@
 package com.example.travelease.model
 
-// Modelo para el Dropdown (Catálogo)
+
 data class TipoTransporte(
     val id: Int,
     val code: String,
@@ -8,7 +8,7 @@ data class TipoTransporte(
     val active: Boolean
 )
 
-// Cambia la clase Transporte que tienes por esta:
+
 data class Transporte(
     val id: Int,
     val type_transport: Int, // Ahora recibe solo el número del ID
@@ -20,7 +20,6 @@ data class Transporte(
     val active: Boolean
 )
 
-// Modelo para Crear (POST)
 data class TransporteRequest(
     val type_transport: Int,
     val origin: String,
@@ -28,7 +27,6 @@ data class TransporteRequest(
     val price: Double
 )
 
-// Modelo para Editar (PATCH - Omitimos el precio)
 data class TransporteUpdateDto(
     val type_transport: Int,
     val origin: String,

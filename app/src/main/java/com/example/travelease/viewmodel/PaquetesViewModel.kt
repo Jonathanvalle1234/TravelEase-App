@@ -15,38 +15,51 @@ import kotlinx.coroutines.launch
 
 class PaquetesViewModel : ViewModel() {
 
-    // 1. Estados de la interfaz (Variables reactivas)
     var paquetesList by mutableStateOf<List<PaqueteDto>>(emptyList())
         private set
 
     var isLoading by mutableStateOf(false)
         private set
 
-    // 2. Función principal para descargar los datos
-    fun obtenerPaquetes(token: String) {
+    var hayMasPaginas by mutableStateOf(false)
+        private set
+
+    private var paginaActual = 1
+
+
+    fun obtenerPaquetes(token: String, pagina: Int = 1, resetear: Boolean = true) {
+        if (isLoading) return
         viewModelScope.launch {
             isLoading = true
             try {
                 val authToken = if (token.startsWith("Token ")) token else "Token $token"
-                val response = RetrofitClient.apiService.obtenerPaquetes(authToken)
+                val response = RetrofitClient.apiService.obtenerPaquetes(authToken, pagina)
 
                 if (response.isSuccessful) {
-                    val respuestaBody = response.body()
-                    Log.d("JSON_REAL", "Respuesta de Django: $respuestaBody")
-                    paquetesList = respuestaBody ?: emptyList()
-                    Log.d("API_PAQUETES", "Éxito: Se descargaron ${paquetesList.size} paquetes")
+                    val body = response.body()
+                    val nuevos = body?.data ?: emptyList()
+                    paquetesList = if (resetear) nuevos else paquetesList + nuevos
+                    paginaActual = body?.pagination?.currentPage ?: 1
+                    hayMasPaginas = body?.pagination?.hasNextPage ?: false
+                    Log.d("API_PAQUETES", "Página $paginaActual: ${nuevos.size} paquetes. ¿Más? $hayMasPaginas")
                 } else {
-                    Log.e("API_PAQUETES", "Error del servidor: Código ${response.code()} ${response.errorBody()?.string()}")
+                    Log.e("API_PAQUETES", "Error ${response.code()}: ${response.errorBody()?.string()}")
                 }
             } catch (e: Exception) {
-                Log.e("API_PAQUETES", "Fallo catastrófico al cargar paquetes: ${e.message}", e)
+                Log.e("API_PAQUETES", "Fallo al cargar paquetes: ${e.message}", e)
             } finally {
                 isLoading = false
             }
         }
     }
 
-    // 3. Guardar o actualizar un paquete. Recibe IDs de servicio y arma "details".
+
+    fun cargarMasPaquetes(token: String) {
+        if (hayMasPaginas && !isLoading) {
+            obtenerPaquetes(token, paginaActual + 1, resetear = false)
+        }
+    }
+
     fun guardarPaquete(
         modo: String,
         paqueteId: Int,
@@ -90,7 +103,7 @@ class PaquetesViewModel : ViewModel() {
                     obtenerPaquetes(authToken)
                     onSuccess()
                 } else {
-                    val errorBody = response.errorBody()?.string() ?: "Error desconocido en el servidor"
+                    val errorBody = response.errorBody()?.string() ?: "Error desconocido"
                     Log.e("DJANGO_ERROR", "Respuesta de error: $errorBody")
                     onError(errorBody)
                 }
