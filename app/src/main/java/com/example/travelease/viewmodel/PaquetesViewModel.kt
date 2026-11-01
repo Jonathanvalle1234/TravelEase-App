@@ -21,27 +21,23 @@ class PaquetesViewModel : ViewModel() {
     var isLoading by mutableStateOf(false)
         private set
 
+    // Paquetes no está paginado, siempre false
     var hayMasPaginas by mutableStateOf(false)
         private set
 
-    private var paginaActual = 1
-
-
-    fun obtenerPaquetes(token: String, pagina: Int = 1, resetear: Boolean = true) {
+    // Carga todos los paquetes (lista simple, sin paginación)
+    fun obtenerPaquetes(token: String) {
         if (isLoading) return
         viewModelScope.launch {
             isLoading = true
             try {
                 val authToken = if (token.startsWith("Token ")) token else "Token $token"
-                val response = RetrofitClient.apiService.obtenerPaquetes(authToken, pagina)
+                val response = RetrofitClient.apiService.obtenerPaquetes(authToken)
 
                 if (response.isSuccessful) {
-                    val body = response.body()
-                    val nuevos = body?.data ?: emptyList()
-                    paquetesList = if (resetear) nuevos else paquetesList + nuevos
-                    paginaActual = body?.pagination?.currentPage ?: 1
-                    hayMasPaginas = body?.pagination?.hasNextPage ?: false
-                    Log.d("API_PAQUETES", "Página $paginaActual: ${nuevos.size} paquetes. ¿Más? $hayMasPaginas")
+                    paquetesList = response.body() ?: emptyList()
+                    hayMasPaginas = false
+                    Log.d("API_PAQUETES", "Paquetes cargados: ${paquetesList.size}")
                 } else {
                     Log.e("API_PAQUETES", "Error ${response.code()}: ${response.errorBody()?.string()}")
                 }
@@ -50,13 +46,6 @@ class PaquetesViewModel : ViewModel() {
             } finally {
                 isLoading = false
             }
-        }
-    }
-
-
-    fun cargarMasPaquetes(token: String) {
-        if (hayMasPaginas && !isLoading) {
-            obtenerPaquetes(token, paginaActual + 1, resetear = false)
         }
     }
 

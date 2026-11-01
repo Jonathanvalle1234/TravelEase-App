@@ -17,7 +17,6 @@ class ReservaPanelRepository {
 
     // ---- Reservas ----
 
-    // Ahora devuelve la respuesta paginada {"data": [...], "pagination": {...}}
     suspend fun obtenerReservas(
         token: String,
         page: Int = 1
@@ -56,8 +55,19 @@ class ReservaPanelRepository {
     suspend fun obtenerClientes(token: String): Response<List<ClienteDto>> =
         api.getClientes(auth(token))
 
-    suspend fun obtenerPaquetes(token: String): Response<List<CatalogoItemDto>> =
-        api.getPaquetesOpciones(auth(token))
+    suspend fun obtenerPaquetes(token: String): List<CatalogoItemDto> {
+        val response = api.obtenerPaquetes(auth(token))
+        return if (response.isSuccessful) {
+            (response.body() ?: emptyList()).map { paquete ->
+                CatalogoItemDto(
+                    id = paquete.id,
+                    nombre = paquete.titulo ?: "Paquete #${paquete.id}"
+                )
+            }
+        } else {
+            emptyList()
+        }
+    }
 
     suspend fun obtenerEstados(token: String): Response<List<CatalogoItemDto>> =
         api.getEstadosReservaOpciones(auth(token))

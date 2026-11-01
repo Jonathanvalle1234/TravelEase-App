@@ -38,8 +38,9 @@ import retrofit2.http.Query
 
 interface TravelEaseApi {
 
-
+    // ====================================================================
     // CLIENTE MÓVIL
+    // ====================================================================
 
     @GET("api/clients-mobile/reservas/")
     suspend fun getReservas(
@@ -69,8 +70,9 @@ interface TravelEaseApi {
         @Body valoracion: ValoracionDto
     ): Response<Unit>
 
-
+    // ====================================================================
     // CLIENTES
+    // ====================================================================
 
     @GET("api/clients/")
     suspend fun getClientes(
@@ -90,8 +92,9 @@ interface TravelEaseApi {
         @Body cliente: ClienteActualizarRequestDto
     ): Response<ClienteDto>
 
-
+    // ====================================================================
     // VUELOS
+    // ====================================================================
 
     @GET("api/services/flights/")
     suspend fun obtenerVuelos(
@@ -131,8 +134,9 @@ interface TravelEaseApi {
         @Path("id") id: Int
     ): Response<Void>
 
-
+    // ====================================================================
     // TRANSPORTES
+    // ====================================================================
 
     @GET("api/catalogos/type-transports/")
     suspend fun obtenerTiposTransporte(
@@ -170,8 +174,9 @@ interface TravelEaseApi {
         @Path("id") id: Int
     ): Response<Void>
 
-
+    // ====================================================================
     // HOTELES
+    // ====================================================================
 
     @GET("api/services/hotels/")
     suspend fun obtenerHoteles(
@@ -204,21 +209,17 @@ interface TravelEaseApi {
         @Body precio: PrecioRequest
     ): Response<Unit>
 
-
+    // ====================================================================
     // PAQUETES
+    // El backend devuelve lista simple (no paginada), así que una sola
+    // función sirve tanto para la lista del asistente como para los
+    // desplegables de Crear/Editar Reserva.
+    // ====================================================================
 
-    // Para los desplegables de Crear/Editar Reserva (lista simple)
-    @GET("api/packages/")
-    suspend fun getPaquetesOpciones(
-        @Header("Authorization") token: String
-    ): Response<List<CatalogoItemDto>>
-
-    // Para la pantalla de Paquetes del asistente (con paginación)
     @GET("api/packages/")
     suspend fun obtenerPaquetes(
-        @Header("Authorization") token: String,
-        @Query("page") page: Int = 1
-    ): Response<RespuestaPaginadaDto<PaqueteDto>>
+        @Header("Authorization") token: String
+    ): Response<List<PaqueteDto>>
 
     @POST("api/packages/")
     suspend fun crearPaquete(
@@ -233,8 +234,9 @@ interface TravelEaseApi {
         @Body request: PaqueteRequestDto
     ): Response<PaqueteDto>
 
-
-    // RESERVAS (PANEL ADMINISTRATIVO)
+    // ====================================================================
+    // RESERVAS (PANEL ADMINISTRATIVO) — paginadas
+    // ====================================================================
 
     @GET("api/reservations/reservations/")
     suspend fun obtenerReservasPanel(
@@ -274,7 +276,9 @@ interface TravelEaseApi {
         @Path("id") id: Int
     ): Response<Void>
 
+    // ====================================================================
     // CATÁLOGOS
+    // ====================================================================
 
     @GET("api/reservations/reservation-statuses/")
     suspend fun getEstadosReservaOpciones(

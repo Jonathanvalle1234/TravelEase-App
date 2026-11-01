@@ -26,7 +26,6 @@ class ReservaPanelViewModel : ViewModel() {
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
 
-    // Paginación
     private val _paginaActual = MutableStateFlow(1)
     val paginaActual: StateFlow<Int> = _paginaActual.asStateFlow()
 
@@ -48,12 +47,12 @@ class ReservaPanelViewModel : ViewModel() {
     private val _tiposPago = MutableStateFlow<List<OpcionItem>>(emptyList())
     val tiposPago: StateFlow<List<OpcionItem>> = _tiposPago.asStateFlow()
 
-    /** Carga clientes, paquetes, estados y tipos de pago. */
     fun cargarCatalogos(token: String) {
         viewModelScope.launch {
             _isLoading.value = true
             val errores = mutableListOf<String>()
             try {
+                // Clientes
                 val rc = repository.obtenerClientes(token)
                 if (rc.isSuccessful) {
                     _clientes.value = (rc.body() ?: emptyList()).map {
@@ -61,13 +60,17 @@ class ReservaPanelViewModel : ViewModel() {
                     }
                 } else errores.add("Clientes ${rc.code()}")
 
-                val rp = repository.obtenerPaquetes(token)
-                if (rp.isSuccessful) {
-                    _paquetes.value = (rp.body() ?: emptyList()).map {
+                // Paquetes: ya devuelve List<CatalogoItemDto> directamente
+                val listaPaquetes = repository.obtenerPaquetes(token)
+                if (listaPaquetes.isNotEmpty()) {
+                    _paquetes.value = listaPaquetes.map {
                         OpcionItem(it.id, it.nombre ?: "Paquete #${it.id}")
                     }
-                } else errores.add("Paquetes ${rp.code()}")
+                } else {
+                    errores.add("Paquetes vacíos o error al cargar")
+                }
 
+                // Estados
                 val re = repository.obtenerEstados(token)
                 if (re.isSuccessful) {
                     _estados.value = (re.body() ?: emptyList()).map {
@@ -75,6 +78,7 @@ class ReservaPanelViewModel : ViewModel() {
                     }
                 } else errores.add("Estados ${re.code()}")
 
+                // Tipos de pago
                 val rt = repository.obtenerTiposPago(token)
                 if (rt.isSuccessful) {
                     _tiposPago.value = (rt.body() ?: emptyList()).map {
@@ -93,7 +97,6 @@ class ReservaPanelViewModel : ViewModel() {
         }
     }
 
-
     fun cargarReservas(token: String, pagina: Int = 1, resetear: Boolean = true) {
         if (_isLoading.value) return
         viewModelScope.launch {
@@ -105,8 +108,7 @@ class ReservaPanelViewModel : ViewModel() {
                     if (response.isSuccessful) {
                         val body = response.body()
                         val nuevas = body?.data ?: emptyList()
-                        _reservas.value = if (resetear) nuevas
-                        else _reservas.value + nuevas
+                        _reservas.value = if (resetear) nuevas else _reservas.value + nuevas
                         val pag = body?.pagination
                         _paginaActual.value = pag?.currentPage ?: 1
                         _totalPaginas.value = pag?.totalPages ?: 1
@@ -125,14 +127,12 @@ class ReservaPanelViewModel : ViewModel() {
         }
     }
 
-    /** Carga la siguiente página y la agrega al final de la lista. */
     fun cargarMasReservas(token: String) {
         if (_hayMasPaginas.value && !_isLoading.value) {
             cargarReservas(token, _paginaActual.value + 1, resetear = false)
         }
     }
 
-    /** Crear una nueva reserva */
     fun crearReserva(token: String, request: ReservaRequest, onComplete: (Boolean) -> Unit) {
         viewModelScope.launch {
             _isLoading.value = true
@@ -159,7 +159,6 @@ class ReservaPanelViewModel : ViewModel() {
         }
     }
 
-
     fun editarReserva(
         token: String,
         id: Int,
@@ -170,7 +169,6 @@ class ReservaPanelViewModel : ViewModel() {
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                // Paso 1: datos generales
                 try {
                     val r1 = repository.actualizarReserva(token, id, campos)
                     Log.d("DEBUG_ESTADO", "PUT reserva: code=${r1.code()} enviado=$campos")
@@ -184,7 +182,6 @@ class ReservaPanelViewModel : ViewModel() {
                     Log.d("DEBUG_ESTADO", "PUT reserva: ProtocolException (se asume ok)")
                 }
 
-                // Paso 2: estado (solo si cambió)
                 if (estadoNuevoId != null) {
                     try {
                         val r2 = repository.actualizarEstado(token, id, estadoNuevoId)
@@ -212,7 +209,6 @@ class ReservaPanelViewModel : ViewModel() {
         }
     }
 
-    /** Eliminar una reserva */
     fun eliminarReserva(token: String, id: Int, onComplete: (Boolean) -> Unit) {
         viewModelScope.launch {
             _isLoading.value = true
