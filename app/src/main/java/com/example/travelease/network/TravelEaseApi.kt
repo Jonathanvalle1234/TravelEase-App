@@ -276,9 +276,8 @@ interface TravelEaseApi {
         @Path("id") id: Int
     ): Response<Void>
 
-    // ====================================================================
+
     // CATÁLOGOS
-    // ====================================================================
 
     @GET("api/reservations/reservation-statuses/")
     suspend fun getEstadosReservaOpciones(

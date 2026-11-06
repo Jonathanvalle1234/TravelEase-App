@@ -13,7 +13,7 @@ class GerenciaViewModel : ViewModel() {
 
     private val repository = GerenciaRepository()
 
-    // Variable de "Estado". Si esta variable cambia, Jetpack Compose redibuja la pantalla solo.
+
     private val _topClientes = MutableStateFlow<List<ClienteDto>>(emptyList())
     val topClientes: StateFlow<List<ClienteDto>> = _topClientes
 

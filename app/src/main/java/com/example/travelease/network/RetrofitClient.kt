@@ -10,7 +10,7 @@ object RetrofitClient {
 
    private const val BASE_URL = "https://travel-ease-api-dpbkcyd3a8cse3gg.mexicocentral-01.azurewebsites.net/"
 
-    // Dejo tu IP local comentada por si necesitas volver a probar en tu red local más adelante
+
     //private const val BASE_URL = "http://172.25.50.12:8000/"
 
     // Creamos el interceptor para registrar peticiones y respuestas en el Logcat
