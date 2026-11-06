@@ -30,6 +30,7 @@ import com.example.travelease.view.PaquetesVendidosScreen
 import com.example.travelease.view.IngresosDestinoScreen
 import com.example.travelease.view.TopClientesScreen
 import com.example.travelease.viewmodel.ClienteViewModel
+import com.example.travelease.viewmodel.ReportViewModel
 
 import com.example.travelease.view.MenuAsistenteScreen
 import com.example.travelease.view.ClientesListScreen
@@ -197,15 +198,15 @@ fun AppNavigation() {
         }
 
         composable("paquetes_vendidos") {
-            PaquetesVendidosScreen(onNavigateBack = { navController.popBackStack() })
+            PaquetesVendidosScreen(viewModel = viewModel(), onNavigateBack = { navController.popBackStack() })
         }
 
         composable("ingresos_destino") {
-            IngresosDestinoScreen(onNavigateBack = { navController.popBackStack() })
+            IngresosDestinoScreen(viewModel = viewModel(), onNavigateBack = { navController.popBackStack() })
         }
 
         composable("top_clientes") {
-            TopClientesScreen(onNavigateBack = { navController.popBackStack() })
+            TopClientesScreen(viewModel = viewModel(), onNavigateBack = { navController.popBackStack() })
         }
 
         // --- 4. ASISTENTE ---

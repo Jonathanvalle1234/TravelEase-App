@@ -33,8 +33,14 @@ import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
+import com.example.travelease.model.PowerBiEmbedResponse
 
 interface TravelEaseApi {
+
+    @GET("api/reports/{key}/embed")
+    suspend fun obtenerReporteEmbed(
+        @Path("key") key: String
+    ): Response<PowerBiEmbedResponse>
 
     @GET("api/clients-mobile/reservas/")
     suspend fun getReservas(

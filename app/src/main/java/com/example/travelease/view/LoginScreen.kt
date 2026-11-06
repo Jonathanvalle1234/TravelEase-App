@@ -27,8 +27,8 @@ fun LoginScreen(
     onNavigateToGerencia: () -> Unit,
     onNavigateToAsistente: () -> Unit
 ) {
-    var usuario by remember { mutableStateOf("") }
-    var contrasena by remember { mutableStateOf("") }
+    var usuario by remember { mutableStateOf("gerente1") }
+    var contrasena by remember { mutableStateOf("gerentepass123") }
     val mensajeRespuesta = viewModel.loginMessage.value
 
     // Obtenemos el contexto de Android para que el ViewModel guarde el token

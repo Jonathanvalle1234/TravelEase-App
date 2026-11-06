@@ -70,6 +70,18 @@ fun GerenciaScreen(
                 texto = "Paquetes más\nvendidos",
                 onClick = onNavigateToPaquetesVendidos
             )
+            Spacer(modifier = Modifier.height(16.dp))
+            MenuGerenciaCard(
+                idImagen = R.drawable.icono_evolution, // El nombre de tu archivo PNG
+                texto = "Evolución de ventas\npor año",
+                onClick = onNavigateToPaquetesVendidos
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            MenuGerenciaCard(
+                idImagen = R.drawable.icono_check_list, // El nombre de tu archivo PNG
+                texto = "Promedio de evaluaciones",
+                onClick = onNavigateToPaquetesVendidos
+            )
 
             Spacer(modifier = Modifier.weight(1f))
 
