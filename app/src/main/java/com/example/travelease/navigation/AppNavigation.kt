@@ -29,6 +29,8 @@ import com.example.travelease.view.EncuestaScreen
 import com.example.travelease.view.PaquetesVendidosScreen
 import com.example.travelease.view.IngresosDestinoScreen
 import com.example.travelease.view.TopClientesScreen
+import com.example.travelease.view.EvolucionVentasScreen
+import com.example.travelease.view.PromedioEvaluacionesScreen
 import com.example.travelease.viewmodel.ClienteViewModel
 import com.example.travelease.viewmodel.ReportViewModel
 
@@ -193,7 +195,9 @@ fun AppNavigation() {
                 onNavigateBack = { navController.popBackStack() },
                 onNavigateToPaquetesVendidos = { navController.navigate("paquetes_vendidos") },
                 onNavigateToIngresosDestino = { navController.navigate("ingresos_destino") },
-                onNavigateToTopClientes = { navController.navigate("top_clientes") }
+                onNavigateToTopClientes = { navController.navigate("top_clientes") },
+                onNavigateToEvaluacionVentas = { navController.navigate("evolucion_ventas") },
+                onNavigateToPromedioEvaluaciones = { navController.navigate("promedio_evaluaciones") }
             )
         }
 
@@ -207,6 +211,14 @@ fun AppNavigation() {
 
         composable("top_clientes") {
             TopClientesScreen(viewModel = viewModel(), onNavigateBack = { navController.popBackStack() })
+        }
+
+        composable("evolucion_ventas") {
+            EvolucionVentasScreen(viewModel = viewModel(), onNavigateBack = { navController.popBackStack() })
+        }
+
+        composable("promedio_evaluaciones") {
+            PromedioEvaluacionesScreen(viewModel = viewModel(), onNavigateBack = { navController.popBackStack() })
         }
 
         // --- 4. ASISTENTE ---

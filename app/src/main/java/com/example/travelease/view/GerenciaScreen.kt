@@ -26,7 +26,9 @@ fun GerenciaScreen(
     onNavigateBack: () -> Unit,
     onNavigateToPaquetesVendidos: () -> Unit,
     onNavigateToIngresosDestino: () -> Unit,
-    onNavigateToTopClientes: () -> Unit
+    onNavigateToTopClientes: () -> Unit,
+    onNavigateToEvaluacionVentas: () -> Unit,
+    onNavigateToPromedioEvaluaciones: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -74,13 +76,13 @@ fun GerenciaScreen(
             MenuGerenciaCard(
                 idImagen = R.drawable.icono_evolution, // El nombre de tu archivo PNG
                 texto = "Evolución de ventas\npor año",
-                onClick = onNavigateToPaquetesVendidos
+                onClick = onNavigateToEvaluacionVentas
             )
             Spacer(modifier = Modifier.height(16.dp))
             MenuGerenciaCard(
                 idImagen = R.drawable.icono_check_list, // El nombre de tu archivo PNG
                 texto = "Promedio de evaluaciones",
-                onClick = onNavigateToPaquetesVendidos
+                onClick = onNavigateToPromedioEvaluaciones
             )
 
             Spacer(modifier = Modifier.weight(1f))

@@ -23,7 +23,7 @@ internal fun PowerBiReportScreen(title: String, reportKey: String, viewModel: Re
 
     LaunchedEffect(reportKey) { viewModel.cargar(reportKey) }
     Column(Modifier.fillMaxSize()) {
-        Text(title, style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(16.dp))
+        Text(title, style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(4.dp))
         Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
             when (val current = state) {
                 ReportUiState.Loading -> CircularProgressIndicator()
