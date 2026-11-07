@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit
 
 /** 10.0.2.2 permite al emulador Android acceder al localhost de la computadora. */
 object ReportsRetrofitClient {
-    private const val BASE_URL = "http://192.168.1.41:8000/"
+    private const val BASE_URL = "https://travel-ease-api-dpbkcyd3a8cse3gg.mexicocentral-01.azurewebsites.net/"
 
     val apiService: TravelEaseApi by lazy {
         Retrofit.Builder()
