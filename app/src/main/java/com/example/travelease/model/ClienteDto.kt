@@ -23,7 +23,6 @@ data class ClienteDto(
     val active: Boolean = true
 )
 
-// 2. EL MODELO PARA ESCRIBIR (POST - Exacto al Body de Bruno)
 data class ClienteRequestDto(
     val name: String,
     @SerializedName("email") val userEmail: String?,       // <-- Cambiado de "user_email" a "email"

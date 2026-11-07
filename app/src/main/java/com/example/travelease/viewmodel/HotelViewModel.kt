@@ -33,9 +33,9 @@ class HotelViewModel : ViewModel() {
                 val response = RetrofitClient.apiService.obtenerHoteles(tokenFinal)
                 if (response.isSuccessful) {
                     _hoteles.value = response.body() ?: emptyList()
-                    println("✅ ¡Hoteles descargados con éxito!")
+                    println(" ¡Hoteles descargados con éxito!")
                 } else {
-                    println("❌ Error Django: ${response.code()} - ${response.errorBody()?.string()}")
+                    println(" Error Django: ${response.code()} - ${response.errorBody()?.string()}")
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -68,7 +68,7 @@ class HotelViewModel : ViewModel() {
                 val token = getTokenSeguro(context)
 
                 if (hotelId == null || hotelId == 0) {
-                    // 🔥 CREAR: 1 sola API con todo (Usa HotelRequest)
+
                     val request = HotelRequest(nombre, ciudad, estrellas, precio)
                     val response = RetrofitClient.apiService.crearHotel(token, request)
 
@@ -79,17 +79,17 @@ class HotelViewModel : ViewModel() {
                         onError("Error al crear: ${response.errorBody()?.string()}")
                     }
                 } else {
-                    // 🔥 EDITAR: 2 APIs separadas (Usa HashMap para el PATCH)
+
                     val datosPatch = java.util.HashMap<String, Any>()
                     datosPatch["name"] = nombre
                     datosPatch["city"] = ciudad
                     datosPatch["stars"] = estrellas
 
-                    // 1. PATCH solo con datos básicos
+
                     val patchResp = RetrofitClient.apiService.actualizarHotel(token, hotelId, datosPatch)
 
                     if (patchResp.isSuccessful) {
-                        // 2. POST solo para el precio nuevo
+
                         val priceResp = RetrofitClient.apiService.actualizarPrecioHotel(token, hotelId, PrecioRequest(precio))
                         if (priceResp.isSuccessful) {
                             obtenerHoteles(context)

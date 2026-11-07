@@ -24,7 +24,7 @@ data class PaqueteDto(
     @SerializedName(value = "precio", alternate = ["price", "cost", "valor", "monto"])
     val precioDirecto: Double = 0.0,
 
-    // Capturamos el JSON crudo de los servicios tal como viene de Django
+
     @SerializedName(value = "services", alternate = ["details"])
     val rawServices: JsonElement? = null
 ) {
@@ -42,7 +42,7 @@ data class PaqueteDto(
                 if (rawServices != null && rawServices.isJsonObject) {
                     val obj = rawServices.asJsonObject
 
-                    // 1. Buscamos en el arreglo de "flights" (vuelos) que Django envió
+
                     if (obj.has("flights") && obj.get("flights").isJsonArray) {
                         val flightsArray = obj.get("flights").asJsonArray
                         for (i in 0 until flightsArray.size()) {
@@ -53,7 +53,7 @@ data class PaqueteDto(
                         }
                     }
 
-                    // 2. Buscamos en el arreglo de "hotels" por si acaso
+
                     if (obj.has("hotels") && obj.get("hotels").isJsonArray) {
                         val hotelsArray = obj.get("hotels").asJsonArray
                         for (i in 0 until hotelsArray.size()) {
@@ -64,7 +64,7 @@ data class PaqueteDto(
                         }
                     }
 
-                    // 3. Buscamos en el arreglo de "transportation" por si acaso
+
                     if (obj.has("transportation") && obj.get("transportation").isJsonArray) {
                         val transArray = obj.get("transportation").asJsonArray
                         for (i in 0 until transArray.size()) {
@@ -79,8 +79,7 @@ data class PaqueteDto(
                 println("Error sumando servicios: ${e.message}")
             }
 
-            // Retornamos la suma de los servicios de los vuelos/hoteles,
-            // o el precio directo si existe, o un respaldo de 500.0 por ley
+
             return when {
                 sumaServicios > 0 -> sumaServicios
                 precioDirecto > 0 -> precioDirecto

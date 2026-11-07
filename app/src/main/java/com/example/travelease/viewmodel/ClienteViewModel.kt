@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
 
 class ClienteViewModel : ViewModel() {
 
-    // Empezamos con el token vacío en memoria
+
     companion object {
         var authToken: String = ""
     }
@@ -69,7 +69,7 @@ class ClienteViewModel : ViewModel() {
                     // 1. Guardamos en la memoria temporal
                     authToken = "Token $tokenLimpio"
 
-                    // 2. 💾 PERSISTENCIA: Guardamos en el disco duro del teléfono
+
                     val sharedPreferences = context.getSharedPreferences("MisPreferencias", Context.MODE_PRIVATE)
                     sharedPreferences.edit().apply {
                         putString("TOKEN", tokenLimpio)
@@ -94,7 +94,7 @@ class ClienteViewModel : ViewModel() {
         }
     }
 
-    // 2. Función para obtener las reservas
+
     fun cargarReservas() {
         viewModelScope.launch {
             try {
@@ -115,22 +115,21 @@ class ClienteViewModel : ViewModel() {
         }
     }
 
-    // 3. Función para cargar los clientes reales (GET)
     fun cargarClientes() {
         viewModelScope.launch {
             try {
-                println("=== 🚀 CARGANDO CLIENTES DESDE DJANGO ===")
+                println("===  CARGANDO CLIENTES DESDE DJANGO ===")
                 val response = RetrofitClient.apiService.getClientes(authToken)
 
                 if (response.isSuccessful) {
                     _listaClientes.value = response.body() ?: emptyList()
-                    println("✅ Éxito: Clientes descargados correctamente -> ${_listaClientes.value}")
+                    println(" Éxito: Clientes descargados correctamente -> ${_listaClientes.value}")
                 } else {
-                    println("🚨 Error al cargar clientes: Código ${response.code()}")
+                    println(" Error al cargar clientes: Código ${response.code()}")
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                println("🚨 Fallo de red al intentar descargar clientes: ${e.message}")
+                println(" Fallo de red al intentar descargar clientes: ${e.message}")
             }
         }
     }
@@ -160,20 +159,20 @@ class ClienteViewModel : ViewModel() {
                     municipality = munId
                 )
 
-                println("=== 🚀 ENVIANDO NUEVO CLIENTE (REQUEST) A DJANGO ===")
+                println("===  ENVIANDO NUEVO CLIENTE (REQUEST) A DJANGO ===")
                 val response = RetrofitClient.apiService.crearCliente(authToken, nuevoCliente)
 
                 if (response.isSuccessful) {
-                    println("✅ ¡Cliente registrado con éxito en la base de datos!")
+                    println(" ¡Cliente registrado con éxito en la base de datos!")
                     onSuccess()
                 } else {
                     val errorBody = response.errorBody()?.string() ?: "Sin detalles"
-                    println("🚨 Error al crear cliente: Código ${response.code()} | Detalle de Django: $errorBody")
+                    println(" Error al crear cliente: Código ${response.code()} | Detalle de Django: $errorBody")
                     onError("Error del servidor: ${response.code()} - $errorBody")
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                println("🚨 Excepción de red al crear cliente: ${e.message}")
+                println(" Excepción de red al crear cliente: ${e.message}")
                 onError("Fallo de conexión: ${e.message}")
             }
         }
@@ -203,22 +202,22 @@ class ClienteViewModel : ViewModel() {
                     municipality = munId
                 )
 
-                println("=== 🚀 ENVIANDO ACTUALIZACIÓN DE CLIENTE A DJANGO ===")
+                println("===  ENVIANDO ACTUALIZACIÓN DE CLIENTE A DJANGO ===")
                 val response = RetrofitClient.apiService.actualizarCliente(authToken, clienteId, request)
 
                 if (response.isSuccessful) {
-                    println("✅ ¡Cliente actualizado con éxito!")
+                    println(" ¡Cliente actualizado con éxito!")
                     cargarClientes() // Refrescar la lista de clientes automáticamente
                     onSuccess()
                 } else {
-                    // 🚀 MAGIA: Extraemos el error exacto de Django para saber qué falla
+
                     val errorBody = response.errorBody()?.string() ?: "Error desconocido"
-                    println("🚨 Error al actualizar cliente: Código ${response.code()} | Detalle: $errorBody")
+                    println(" Error al actualizar cliente: Código ${response.code()} | Detalle: $errorBody")
                     onError("Error de Django: $errorBody")
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                println("🚨 Excepción de red al actualizar cliente: ${e.message}")
+                println(" Excepción de red al actualizar cliente: ${e.message}")
                 onError("Error de conexión: ${e.message}")
             }
         }
@@ -319,7 +318,7 @@ class ClienteViewModel : ViewModel() {
                     volverContratar = volverContratar
                 )
 
-                println("🔑 TOKEN QUE ESTOY ENVIANDO A ENCUESTAS: $authToken")
+                println(" TOKEN QUE ESTOY ENVIANDO A ENCUESTAS: $authToken")
                 val response = RetrofitClient.apiService.postEncuestaSatisfaccion(authToken, encuestaDto)
 
                 if (response.isSuccessful) {
@@ -342,7 +341,7 @@ class ClienteViewModel : ViewModel() {
         val sharedPreferences = context.getSharedPreferences("MisPreferencias", Context.MODE_PRIVATE)
         sharedPreferences.edit().clear().apply()
 
-        println("🔒 Sesión cerrada: Memoria temporal y disco duro limpiados.")
+        println(" Sesión cerrada: Memoria temporal y disco duro limpiados.")
     }
 
 }

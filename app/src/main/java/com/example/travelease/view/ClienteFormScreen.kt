@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.travelease.viewmodel.ClienteViewModel
 
-// Modelos locales para la jerarquía en cascada
+
 data class MunicipioModel(val id: Int, val nombre: String)
 data class DepartamentoModel(val id: Int, val nombre: String, val municipios: List<MunicipioModel>)
 
@@ -43,7 +43,7 @@ fun ClienteFormScreen(
     var direccion by remember { mutableStateOf("") }
     var telefono by remember { mutableStateOf("") }
 
-    // --- LISTA OFICIAL COMPLETA DE DEPARTAMENTOS Y MUNICIPIOS DE NICARAGUA ---
+
     val listaDepartamentos = remember {
         listOf(
             DepartamentoModel(id = 1, nombre = "Managua", municipios = listOf(MunicipioModel(1, "Managua"), MunicipioModel(2, "Tipitapa"), MunicipioModel(3, "Ciudad Sandino"), MunicipioModel(4, "Mateare"), MunicipioModel(5, "San Rafael del Sur"), MunicipioModel(6, "Villa El Carmen"), MunicipioModel(7, "El Crucero"))),
@@ -86,7 +86,7 @@ fun ClienteFormScreen(
             if (listaClientes.isEmpty()) {
                 viewModel.cargarClientes()
             }
-            // 2. Si ya llegaron los clientes, buscamos al nuestro y llenamos todo
+
             else {
                 val clienteAEditar = listaClientes.find { it.id == clienteId }
 
@@ -111,7 +111,7 @@ fun ClienteFormScreen(
                             }
                         }
                     }
-                    // Bloqueamos para que no se vuelva a cargar y te borre algo mientras editas
+
                     datosLlenados = true
                 }
             }

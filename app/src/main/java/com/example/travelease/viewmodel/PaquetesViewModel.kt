@@ -15,15 +15,19 @@ import kotlinx.coroutines.launch
 
 class PaquetesViewModel : ViewModel() {
 
-    // 1. Estados de la interfaz (Variables reactivas)
     var paquetesList by mutableStateOf<List<PaqueteDto>>(emptyList())
         private set
 
     var isLoading by mutableStateOf(false)
         private set
 
-    // 2. Función principal para descargar los datos
+    // Paquetes no está paginado, siempre false
+    var hayMasPaginas by mutableStateOf(false)
+        private set
+
+    // Carga todos los paquetes (lista simple, sin paginación)
     fun obtenerPaquetes(token: String) {
+        if (isLoading) return
         viewModelScope.launch {
             isLoading = true
             try {
@@ -31,22 +35,20 @@ class PaquetesViewModel : ViewModel() {
                 val response = RetrofitClient.apiService.obtenerPaquetes(authToken)
 
                 if (response.isSuccessful) {
-                    val respuestaBody = response.body()
-                    Log.d("JSON_REAL", "Respuesta de Django: $respuestaBody")
-                    paquetesList = respuestaBody ?: emptyList()
-                    Log.d("API_PAQUETES", "Éxito: Se descargaron ${paquetesList.size} paquetes")
+                    paquetesList = response.body() ?: emptyList()
+                    hayMasPaginas = false
+                    Log.d("API_PAQUETES", "Paquetes cargados: ${paquetesList.size}")
                 } else {
-                    Log.e("API_PAQUETES", "Error del servidor: Código ${response.code()} ${response.errorBody()?.string()}")
+                    Log.e("API_PAQUETES", "Error ${response.code()}: ${response.errorBody()?.string()}")
                 }
             } catch (e: Exception) {
-                Log.e("API_PAQUETES", "Fallo catastrófico al cargar paquetes: ${e.message}", e)
+                Log.e("API_PAQUETES", "Fallo al cargar paquetes: ${e.message}", e)
             } finally {
                 isLoading = false
             }
         }
     }
 
-    // 3. Guardar o actualizar un paquete. Recibe IDs de servicio y arma "details".
     fun guardarPaquete(
         modo: String,
         paqueteId: Int,
@@ -90,7 +92,7 @@ class PaquetesViewModel : ViewModel() {
                     obtenerPaquetes(authToken)
                     onSuccess()
                 } else {
-                    val errorBody = response.errorBody()?.string() ?: "Error desconocido en el servidor"
+                    val errorBody = response.errorBody()?.string() ?: "Error desconocido"
                     Log.e("DJANGO_ERROR", "Respuesta de error: $errorBody")
                     onError(errorBody)
                 }

@@ -11,5 +11,5 @@ data class ValoracionDto(
     val nombre: String,
     val descripcion: String,
     val precio: Double,
-    val vuelo: List<Any> = emptyList() // O una lista específica si manejas un modelo para los vuelos
+    val vuelo: List<Any> = emptyList()
 )

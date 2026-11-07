@@ -46,7 +46,6 @@ fun CrearReservaScreen(
 ) {
     val context = LocalContext.current
 
-    // Valores por defecto como en Figma: Pendiente y Efectivo
     fun estadoInicial() = estados.firstOrNull { it.nombre.equals("Pendiente", true) } ?: estados.firstOrNull()
     fun pagoInicial() = tiposPago.firstOrNull { it.nombre.equals("Efectivo", true) } ?: tiposPago.firstOrNull()
 
@@ -128,7 +127,7 @@ fun CrearReservaScreen(
             Spacer(Modifier.height(18.dp))
 
             CampoDropdown(
-                etiqueta = "✈️ PAQUETE TURÍSTICO",
+                etiqueta = " PAQUETE TURÍSTICO",
                 placeholder = "Seleccione un paquete",
                 opciones = paquetes,
                 seleccion = paquete,
@@ -138,7 +137,7 @@ fun CrearReservaScreen(
             Spacer(Modifier.height(18.dp))
 
             CampoDropdown(
-                etiqueta = "📌 ESTADO DE LA RESERVA",
+                etiqueta = " ESTADO DE LA RESERVA",
                 placeholder = "Seleccione un estado",
                 opciones = estados,
                 seleccion = estado,
@@ -148,7 +147,7 @@ fun CrearReservaScreen(
             Spacer(Modifier.height(18.dp))
 
             CampoDropdown(
-                etiqueta = "🎫 TIPO DE PAGO",
+                etiqueta = " TIPO DE PAGO",
                 placeholder = "Seleccione un tipo de pago",
                 opciones = tiposPago,
                 seleccion = tipoPago,

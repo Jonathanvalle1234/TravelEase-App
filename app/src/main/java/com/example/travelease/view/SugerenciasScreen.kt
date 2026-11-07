@@ -98,7 +98,7 @@ fun SugerenciasScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // 👉 LA FLECHA MINIMALISTA (Abajo, separada y a la izquierda)
+
         Box(
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.CenterStart // La empuja totalmente a la izquierda
@@ -116,7 +116,7 @@ fun SugerenciasScreen(
             }
         }
 
-        // Espacio para que el teclado no oculte la flecha
+
         Spacer(modifier = Modifier.height(100.dp))
     }
 }

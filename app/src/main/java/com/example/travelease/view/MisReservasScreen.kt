@@ -165,7 +165,7 @@ fun MisReservasScreen(
                     }
                 }
 
-                // 👉 LA FLECHA MINIMALISTA (Abajo, separada y a la izquierda)
+
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()

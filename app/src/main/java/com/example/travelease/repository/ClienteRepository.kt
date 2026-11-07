@@ -8,7 +8,7 @@ import kotlinx.coroutines.withContext
 
 class ClienteRepository {
 
-    // Función para enviar datos al servidor en un hilo secundario (IO)
+
     suspend fun enviarEncuesta(encuesta: EncuestaDto): Boolean {
         return withContext(Dispatchers.IO) {
             try {
@@ -19,7 +19,7 @@ class ClienteRepository {
         }
     }
 
-    // Función real para enviar valoraciones a Django
+
     suspend fun enviarValoracion(token: String, valoracion: ValoracionDto): Boolean { // <-- Agregamos el token aquí
         return withContext(Dispatchers.IO) {
             try {

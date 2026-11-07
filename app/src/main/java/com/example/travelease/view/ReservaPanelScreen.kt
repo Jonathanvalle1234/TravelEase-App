@@ -9,6 +9,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -46,8 +47,23 @@ fun ReservaPanelScreen(
     val reservas by viewModel.reservas.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
+    val hayMasPaginas by viewModel.hayMasPaginas.collectAsState()
 
+
+    val listState = rememberLazyListState()
+
+    // Carga inicial
     LaunchedEffect(Unit) { viewModel.cargarReservas(token) }
+
+    // Detector de scroll: cuando quedan 3 o menos ítems por ver, carga más
+    LaunchedEffect(listState.firstVisibleItemIndex, reservas.size) {
+        val totalItems = listState.layoutInfo.totalItemsCount
+        val ultimoVisible = listState.firstVisibleItemIndex +
+                listState.layoutInfo.visibleItemsInfo.size
+        if (totalItems > 0 && ultimoVisible >= totalItems - 3 && hayMasPaginas && !isLoading) {
+            viewModel.cargarMasReservas(token)
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -103,6 +119,7 @@ fun ReservaPanelScreen(
 
             Spacer(Modifier.height(10.dp))
 
+            // 3. Mensaje de error
             errorMessage?.let {
                 Card(
                     colors = CardDefaults.cardColors(MaterialTheme.colorScheme.errorContainer),
@@ -119,8 +136,12 @@ fun ReservaPanelScreen(
                 }
             }
 
-            // 3. Lista
-            Box(Modifier.weight(1f).fillMaxWidth()) {
+
+            Box(
+                Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+            ) {
                 when {
                     isLoading && reservas.isEmpty() -> {
                         CircularProgressIndicator(
@@ -137,9 +158,11 @@ fun ReservaPanelScreen(
                         )
                     }
                     else -> {
-                        LazyColumn(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+                        LazyColumn(
+                            state = listState,
+                            verticalArrangement = Arrangement.spacedBy(14.dp)
+                        ) {
                             items(reservas) { reserva ->
-                                // Temporal: sin bloqueo para poder probar Editar en cualquier reserva
                                 val bloqueada = false
                                 ReservaCard(
                                     cliente = reserva.nombreCliente,
@@ -151,20 +174,60 @@ fun ReservaPanelScreen(
                                     onDelete = {
                                         viewModel.eliminarReserva(token, reserva.id) { exito ->
                                             if (exito) {
-                                                Toast.makeText(context, "🗑️ Reserva eliminada con éxito", Toast.LENGTH_SHORT).show()
+                                                Toast.makeText(
+                                                    context,
+                                                    "🗑️ Reserva eliminada con éxito",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
                                             } else {
-                                                Toast.makeText(context, "❌ Error al eliminar reserva", Toast.LENGTH_SHORT).show()
+                                                Toast.makeText(
+                                                    context,
+                                                    "❌ Error al eliminar reserva",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
                                             }
                                         }
                                     }
                                 )
+                            }
+
+                            // Indicador de carga al final mientras llega la siguiente página
+                            if (isLoading && reservas.isNotEmpty()) {
+                                item {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(16.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        CircularProgressIndicator(
+                                            color = AzulHeader,
+                                            modifier = Modifier.size(28.dp),
+                                            strokeWidth = 2.dp
+                                        )
+                                    }
+                                }
+                            }
+
+
+                            if (!hayMasPaginas && reservas.isNotEmpty()) {
+                                item {
+                                    Text(
+                                        text = "✅ Todas las reservas cargadas (${reservas.size})",
+                                        fontSize = 12.sp,
+                                        color = Color.Gray,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = 12.dp, horizontal = 8.dp)
+                                    )
+                                }
                             }
                         }
                     }
                 }
             }
 
-            // 4. Flecha de regreso
+            // 5. Flecha de regreso
             Box(
                 modifier = Modifier
                     .padding(vertical = 6.dp)
@@ -212,7 +275,6 @@ fun ReservaCard(
     val forma = RoundedCornerShape(10.dp)
 
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        // Caja de datos
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -221,13 +283,12 @@ fun ReservaCard(
                 .padding(horizontal = 10.dp, vertical = 14.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            Text("👤 Cliente: $cliente", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = Color.Black)
-            Text("✈️ Paquete: $paquete", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = Color.Black)
-            Text("🎫 Precio: $${"%.2f".format(precio)}", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = Color.Black)
-            Text("📌 Estado: $estado", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = Color.Black)
+            Text(" Cliente: $cliente", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = Color.Black)
+            Text(" Paquete: $paquete", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = Color.Black)
+            Text(" Precio: $${"%.2f".format(precio)}", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = Color.Black)
+            Text(" Estado: $estado", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = Color.Black)
         }
 
-        // Caja de acciones con botones circulares de color
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -238,7 +299,6 @@ fun ReservaCard(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Botón Editar: círculo azul, lápiz amarillo
             Box(
                 modifier = Modifier
                     .size(42.dp)
@@ -255,7 +315,6 @@ fun ReservaCard(
                 )
             }
 
-            // Botón Eliminar
             Box(
                 modifier = Modifier
                     .size(42.dp)

@@ -87,7 +87,7 @@ fun HotelFormScreen(
                                 estrellas = estrellas.toIntOrNull() ?: 1, precioStr = precio,
                                 onSuccess = {
                                     isLoading = false
-                                    // 🔥 MAGIA AQUÍ: Mostramos el mensaje de éxito antes de regresar
+
                                     val mensajeExito = if (hotelId == null) "Hotel agregado con éxito" else "Hotel actualizado con éxito"
                                     Toast.makeText(context, mensajeExito, Toast.LENGTH_SHORT).show()
 

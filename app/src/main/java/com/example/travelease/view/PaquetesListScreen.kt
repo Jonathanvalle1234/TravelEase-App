@@ -35,7 +35,7 @@ fun PaquetesListScreen(
     onDeleteClick: (PaqueteDto) -> Unit = {},
     onBackClick: () -> Unit = {}
 ) {
-    // Cuando la pantalla se carga, disparamos la petición a la base de datos
+
     LaunchedEffect(Unit) {
         viewModel.obtenerPaquetes(token)
     }
@@ -74,7 +74,7 @@ fun PaquetesListScreen(
             }
         }
 
-        // --- Indicador de Carga o Lista de Paquetes Reales ---
+
         if (viewModel.isLoading) {
             Box(modifier = Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
@@ -130,7 +130,7 @@ fun PaqueteCardItemReal(
                         modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp)
                     )
 
-                    // --- Fila para País con Icono ---
+
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.padding(vertical = 2.dp)
@@ -164,7 +164,7 @@ fun PaqueteCardItemReal(
 
                     Spacer(modifier = Modifier.height(4.dp))
 
-                    // --- Fila para Total / Precio con Icono de Dinero ---
+
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.padding(vertical = 2.dp)
