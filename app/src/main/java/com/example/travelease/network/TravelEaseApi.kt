@@ -34,6 +34,8 @@ import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
 import com.example.travelease.model.PowerBiEmbedResponse
+import com.example.travelease.model.RespuestaPaginadaDto
+import retrofit2.http.Query
 
 interface TravelEaseApi {
 
@@ -190,10 +192,13 @@ interface TravelEaseApi {
     // RUTAS DEL PANEL ADMINISTRATIVO DE RESERVAS
     // ====================================================================
 
+
     @GET("api/reservations/reservations/")
     suspend fun obtenerReservasPanel(
-        @Header("Authorization") token: String
-    ): Response<List<ReservaAdminDto>>
+        @Header("Authorization") token: String,
+        @Query("page") page: Int = 1
+    ): Response<RespuestaPaginadaDto<ReservaAdminDto>>
+
 
     @GET("api/reservations/reservations/{id}/")
     suspend fun obtenerReservaPanelPorId(
